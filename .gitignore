@@ -1,0 +1,19 @@
+# Rust
+shared/target/
+core-lib/target/
+core-lib/bindings/
+*.rs.bk
+
+# iOS
+ios/build/
+ios/DerivedData/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+
+tools/xcodegen/
+tools/*.zip
+
+# macOS
+.DS_Store
+build
