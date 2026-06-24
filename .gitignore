@@ -2,18 +2,28 @@
 shared/target/
 core-lib/target/
 core-lib/bindings/
+core-lib/Cargo.lock
 *.rs.bk
 
-# iOS
-ios/build/
-ios/DerivedData/
-ios/*.xcworkspace/xcuserdata/
-ios/*.xcodeproj/xcuserdata/
-ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+# iOS generated artifacts
+ios/invoice/core_lib.xcframework/
+ios/invoice/invoice/core_lib.swift
 
+# iOS Xcode user data
+ios/**/xcuserdata/
+ios/**/*.xcuserstate
+ios/**/xcschememanagement.plist
+
+# macOS system files
+.DS_Store
+**/.DS_Store
+
+# Editor config
+.zed/
+
+# Tools/tools artifacts
 tools/xcodegen/
 tools/*.zip
 
-# macOS
-.DS_Store
+# Build
 build
