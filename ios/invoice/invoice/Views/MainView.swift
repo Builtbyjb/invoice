@@ -24,7 +24,7 @@ struct MainView: View {
                     InitLoadingView().task {
                         do {
                             authState = try await checkAuth(
-                                demo: .notAuthenticated
+                                demo: .authenticated
                             )
 
                         } catch {
@@ -34,13 +34,34 @@ struct MainView: View {
                 case .authenticating:
                     ProgressView()
                 case .authenticated:
-                    ContentView()
+                    ContentView().navigationDestination(for: Route.self){ route in
+                        router.switchView(route: route)
+                        
+                    }.toolbar{
+                        ToolbarItemGroup(placement: .topBarTrailing) {
+                            ControlGroup {
+                                Button(action: {
+                                    router.navigate(to: .help)
+                                }) {
+                                    Image(systemName: "questionmark.circle")
+                                }
+                                Button(action: {
+                                    router.navigate(to: .notification)
+                                }) {
+                                    Image(systemName: "bell")
+                                }
+                                Button(action: {
+                                    router.navigate(to: .settings)
+                                    
+                                }) {
+                                    Image(systemName: "gear")
+                                }
+                            }
+                        }
+                    }
                 case .notAuthenticated:
                     AuthView().navigationDestination(for: Route.self) { route in
-                        switch route {
-                        case .logIn: LogInView()
-                        case .signUp: SignUpView()
-                        }
+                        router.switchView(route: route)
                     }
                 }
 

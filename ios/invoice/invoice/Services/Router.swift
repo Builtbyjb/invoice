@@ -10,22 +10,35 @@ import SwiftUI
 enum Route: Hashable {
     case logIn
     case signUp
-    
+    case help
+    case settings
+    case notification
 }
 
 @Observable
 class Router {
     var path = NavigationPath()
-    
+
     func navigate(to route: Route) {
         path.append(route)
     }
-    
+
     func pop() {
         path.removeLast()
     }
-    
+
     func popToRoot() {
         path.removeLast(path.count)
+    }
+
+    @ViewBuilder
+    func switchView(route: Route) -> some View {
+        switch route {
+        case .logIn: LogInView()
+        case .signUp: SignUpView()
+        case .help: HelpView()
+        case .settings: SettingView()
+        case .notification: NotificationView()
+        }
     }
 }

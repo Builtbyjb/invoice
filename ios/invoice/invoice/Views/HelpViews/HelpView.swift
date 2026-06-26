@@ -1,5 +1,5 @@
 //
-//  ClientsView.swift
+//  HelpView.swift
 //  invoice
 //
 //  Created by Ajibola Awotide on 2026-06-26.
@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct ClientsView: View {
+struct HelpView: View {
     var body: some View {
-        Text("Clients").font(.largeTitle)
+        Text("Help").font(.largeTitle)
     }
 }
 
 #Preview {
-    ClientsView()
+    HelpView()
 }

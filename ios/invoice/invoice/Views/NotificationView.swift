@@ -1,5 +1,5 @@
 //
-//  ClientsView.swift
+//  NotificationView.swift
 //  invoice
 //
 //  Created by Ajibola Awotide on 2026-06-26.
@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct ClientsView: View {
+struct NotificationView: View {
     var body: some View {
-        Text("Clients").font(.largeTitle)
+        Text("Notifications").font(.largeTitle)
     }
 }
 
 #Preview {
-    ClientsView()
+    NotificationView()
 }

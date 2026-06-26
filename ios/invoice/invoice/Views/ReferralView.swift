@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ReferralView: View {
     var body: some View {
-        Text("Referrals")
+        Text("Referrals").font(.largeTitle)
     }
 }
 
