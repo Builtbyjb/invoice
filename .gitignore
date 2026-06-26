@@ -8,6 +8,7 @@ core-lib/Cargo.lock
 # iOS generated artifacts
 ios/invoice/core_lib.xcframework/
 ios/invoice/invoice/core_lib.swift
+ios/invoice/invoice/Playground.swift
 
 # iOS Xcode user data
 ios/**/xcuserdata/
