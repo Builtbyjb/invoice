@@ -24,7 +24,7 @@ struct MainView: View {
                     InitLoadingView().task {
                         do {
                             authState = try await checkAuth(
-                                demo: .authenticated
+                                demo: .notAuthenticated
                             )
 
                         } catch {
@@ -36,7 +36,6 @@ struct MainView: View {
                 case .authenticated:
                     ContentView().navigationDestination(for: Route.self){ route in
                         router.switchView(route: route)
-                        
                     }.toolbar{
                         ToolbarItemGroup(placement: .topBarTrailing) {
                             ControlGroup {

@@ -12,15 +12,40 @@ struct AuthView: View {
 
     var body: some View {
         VStack {
+            Text("Invoice").font(.largeTitle.bold())
             Spacer()
-            
-            Button("Create an Account") {
+
+            Button {
                 router.navigate(to: .signUp)
-            }.buttonStyle(.borderedProminent)
-            
-            Button("Sign In") {
+            } label: {
+                Text("Create an account")
+                    .padding(.vertical, 8)
+                    .frame(width: 200)
+            }
+            .buttonStyle(.glassProminent)
+
+            // Divider
+            HStack {
+                Color.gray.frame(height: 1)
+
+                Text("or")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .padding(.horizontal, 4)
+
+                Color.gray.frame(height: 1)
+            }
+            .frame(maxWidth: 350)
+            .padding(.vertical)
+
+            Button {
                 router.navigate(to: .logIn)
-            }.buttonStyle(.bordered)
+            } label: {
+                Text("Sign In")
+                    .padding(.vertical, 8)
+                    .frame(width: 200)
+            }
+            .buttonStyle(.glass)
         }
     }
 }

@@ -22,7 +22,7 @@ struct ContentView: View {
             ReferralView().tabItem {
                 Label("Referral", systemImage: "gift.fill")
             }
-        }.accentColor(Color.green)
+        }
     }
 }
 
