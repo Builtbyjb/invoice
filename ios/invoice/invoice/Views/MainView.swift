@@ -24,7 +24,7 @@ struct MainView: View {
                     InitLoadingView().task {
                         do {
                             authState = try await checkAuth(
-                                demo: .notAuthenticated
+                                demo: .authenticated
                             )
 
                         } catch {
