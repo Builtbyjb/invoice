@@ -10,8 +10,7 @@ import SwiftUI
 struct CreateClientView: View {
     let mode: ClientFormRoute
     @Binding var clients: [Client]
-    let onComplete: () -> Void
-    
+
     @State private var name: String = ""
     @State private var email: String = ""
     @State private var phone: String = ""
@@ -19,12 +18,11 @@ struct CreateClientView: View {
     @State private var city: String = ""
     @State private var country: String = ""
     @State private var isSaving: Bool = false
-    
-    init(mode: ClientFormRoute, clients: Binding<[Client]>, onComplete: @escaping () -> Void) {
+
+    init(mode: ClientFormRoute, clients: Binding<[Client]>) {
         self.mode = mode
         self._clients = clients
-        self.onComplete = onComplete
-        
+
         switch mode {
         case .create:
             break
@@ -37,30 +35,56 @@ struct CreateClientView: View {
             _country = State(initialValue: client.country)
         }
     }
-    
+
     var isFormValid: Bool {
         !name.isEmpty && !email.isEmpty
     }
-    
+
     var title: String {
         switch mode {
         case .create: return "New Client"
         case .edit: return "Edit Client"
         }
     }
-    
+
     var body: some View {
         Form {
             Section("Contact Information") {
-                LabeledTextField(title: "Name", text: $name, icon: "person.fill")
-                LabeledTextField(title: "Email", text: $email, icon: "envelope.fill", keyboard: .emailAddress)
-                LabeledTextField(title: "Phone Number", text: $phone, icon: "phone.fill", keyboard: .phonePad)
+                LabeledTextField(
+                    title: "Name",
+                    text: $name,
+                    icon: "person.fill"
+                )
+                LabeledTextField(
+                    title: "Email",
+                    text: $email,
+                    icon: "envelope.fill",
+                    keyboard: .emailAddress
+                )
+                LabeledTextField(
+                    title: "Phone Number",
+                    text: $phone,
+                    icon: "phone.fill",
+                    keyboard: .phonePad
+                )
             }
-            
+
             Section("Address") {
-                LabeledTextField(title: "Street Address", text: $address, icon: "house.fill")
-                LabeledTextField(title: "City", text: $city, icon: "building.2.fill")
-                LabeledTextField(title: "Country", text: $country, icon: "globe")
+                LabeledTextField(
+                    title: "Street Address",
+                    text: $address,
+                    icon: "house.fill"
+                )
+                LabeledTextField(
+                    title: "City",
+                    text: $city,
+                    icon: "building.2.fill"
+                )
+                LabeledTextField(
+                    title: "Country",
+                    text: $country,
+                    icon: "globe"
+                )
             }
         }
         .navigationTitle(title)
@@ -68,7 +92,7 @@ struct CreateClientView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button {
-                    onComplete()
+//                    onComplete()
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 17, weight: .semibold))
@@ -89,10 +113,10 @@ struct CreateClientView: View {
             }
         }
     }
-    
+
     private func save() {
         isSaving = true
-        
+
         // Simulate async save
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             switch mode {
@@ -107,7 +131,9 @@ struct CreateClientView: View {
                 )
                 clients.append(newClient)
             case .edit(let existing):
-                if let index = clients.firstIndex(where: { $0.id == existing.id }) {
+                if let index = clients.firstIndex(where: {
+                    $0.id == existing.id
+                }) {
                     clients[index].name = name
                     clients[index].email = email
                     clients[index].phone = phone
@@ -117,7 +143,7 @@ struct CreateClientView: View {
                 }
             }
             isSaving = false
-            onComplete()
+//            onComplete()
         }
     }
 }
@@ -127,7 +153,7 @@ struct LabeledTextField: View {
     @Binding var text: String
     let icon: String
     var keyboard: UIKeyboardType = .default
-    
+
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
@@ -141,7 +167,5 @@ struct LabeledTextField: View {
 }
 
 #Preview {
-    NavigationStack {
-        CreateClientView(mode: .create, clients: .constant([])) {}
-    }
+    CreateClientView(mode: .create, clients: .constant([]))
 }

@@ -92,5 +92,5 @@ struct LogInView: View {
 }
 
 #Preview {
-    LogInView().environment(Router())
+    LogInView().environment(Router.shared)
 }

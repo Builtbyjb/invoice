@@ -14,11 +14,10 @@ enum AuthState {
 
 struct MainView: View {
     @State private var authState: AuthState = .undefined
-    @State private var router = Router()
+//    @State private var router = Router()
 
     var body: some View {
         Group {
-            NavigationStack(path: $router.path) {
                 switch authState {
                 case .undefined:
                     InitLoadingView().task {
@@ -34,38 +33,35 @@ struct MainView: View {
                 case .authenticating:
                     ProgressView()
                 case .authenticated:
-                    ContentView().navigationDestination(for: Route.self){ route in
-                        router.switchView(route: route)
-                    }.toolbar{
-                        ToolbarItemGroup(placement: .topBarTrailing) {
-                            ControlGroup {
-                                Button(action: {
-                                    router.navigate(to: .help)
-                                }) {
-                                    Image(systemName: "questionmark.circle")
-                                }
-                                Button(action: {
-                                    router.navigate(to: .notification)
-                                }) {
-                                    Image(systemName: "bell")
-                                }
-                                Button(action: {
-                                    router.navigate(to: .settings)
-                                    
-                                }) {
-                                    Image(systemName: "gear")
-                                }
-                            }
-                        }
-                    }
+                    ContentView()
+//                        .navigationDestination(for: Route.self){ route in
+//                    }.toolbar{
+//                        ToolbarItemGroup(placement: .topBarTrailing) {
+//                            ControlGroup {
+//                                Button(action: {
+//                                    router.navigate(to: .help)
+//                                }) {
+//                                    Image(systemName: "questionmark.circle")
+//                                }
+//                                Button(action: {
+//                                    router.navigate(to: .notification)
+//                                }) {
+//                                    Image(systemName: "bell")
+//                                }
+//                                Button(action: {
+//                                    router.navigate(to: .settings)
+//                                    
+//                                }) {
+//                                    Image(systemName: "gear")
+//                                }
+//                            }
+//                        }
+//                    }
                 case .notAuthenticated:
-                    AuthView().navigationDestination(for: Route.self) { route in
-                        router.switchView(route: route)
-                    }
+                    AuthView()
                 }
 
             }
-        }.environment(router)
     }
 
     func checkAuth(demo: AuthState) async throws -> AuthState {

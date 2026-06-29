@@ -104,5 +104,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView().environment(Router())
+    SignUpView().environment(Router.shared)
 }

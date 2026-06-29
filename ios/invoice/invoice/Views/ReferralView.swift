@@ -8,46 +8,75 @@
 import SwiftUI
 
 struct ReferralView: View {
+    @State private var router = Router.shared
     @State private var copied = false
 
     private let referralCode = "INVOICE123"
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                // MARK: - Section 1: Stats
-                VStack(spacing: 16) {
-                    StatCard(
-                        title: "Total Referrals",
-                        value: "12",
-                        icon: "person.2.fill",
-                        iconColor: .blue,
-                        isLoading: false
-                    )
-                    StatCard(
-                        title: "Active Referrals",
-                        value: "8",
-                        icon: "person.fill.checkmark",
-                        iconColor: .green,
-                        isLoading: false
-                    )
-                    StatCard(
-                        title: "Total Earnings",
-                        value: "$120.00",
-                        icon: "dollarsign.circle.fill",
-                        iconColor: .orange,
-                        isLoading: false
-                    )
-                    payoutCard
+        NavigationStack(path: $router.path) {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // MARK: - Section 1: Stats
+                    VStack(spacing: 16) {
+                        StatCard(
+                            title: "Total Referrals",
+                            value: "12",
+                            icon: "person.2.fill",
+                            iconColor: .blue,
+                            isLoading: false
+                        )
+                        StatCard(
+                            title: "Active Referrals",
+                            value: "8",
+                            icon: "person.fill.checkmark",
+                            iconColor: .green,
+                            isLoading: false
+                        )
+                        StatCard(
+                            title: "Total Earnings",
+                            value: "$120.00",
+                            icon: "dollarsign.circle.fill",
+                            iconColor: .orange,
+                            isLoading: false
+                        )
+                        payoutCard
+                    }
+
+                    // MARK: - Section 2: Referral Code
+                    referralCodeCard
+
+                    // MARK: - Section 3: How It Works
+                    howItWorksCard
                 }
-
-                // MARK: - Section 2: Referral Code
-                referralCodeCard
-
-                // MARK: - Section 3: How It Works
-                howItWorksCard
+                .padding()
             }
-            .padding()
+            .navigationDestination(for: Route.self) { route in
+                router.switchView(route: route)
+            }
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    ControlGroup {
+                        Button(action: {
+                            router.navigate(to: .help)
+                        }) {
+                            Image(systemName: "questionmark.circle")
+                        }
+                        Button(action: {
+                            router.navigate(to: .notification)
+                        }) {
+                            Image(systemName: "bell")
+                        }
+                        Button(action: {
+                            router.navigate(to: .settings)
+
+                        }) {
+                            Image(systemName: "gear")
+                        }
+                    }
+                }
+            }
+
         }
     }
 
@@ -137,9 +166,11 @@ struct ReferralView: View {
                 }
             }
 
-            Text("Users that sign up with the referral code get one extra month free trial.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            Text(
+                "Users that sign up with the referral code get one extra month free trial."
+            )
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -158,7 +189,8 @@ struct ReferralView: View {
                 stepView(
                     number: "1",
                     title: "Share Your Referral Link",
-                    description: "Share your referral link with your friends to earn rewards when they subscribe."
+                    description:
+                        "Share your referral link with your friends to earn rewards when they subscribe."
                 )
 
                 Divider()
@@ -166,7 +198,8 @@ struct ReferralView: View {
                 stepView(
                     number: "2",
                     title: "Your Friend Subscribes",
-                    description: "Your friend creates an account, and purchases a subscription."
+                    description:
+                        "Your friend creates an account, and purchases a subscription."
                 )
 
                 Divider()
@@ -174,7 +207,8 @@ struct ReferralView: View {
                 stepView(
                     number: "3",
                     title: "Earn Rewards",
-                    description: "You get 5% of each friend's subscription amount for as long as they are subscribed."
+                    description:
+                        "You get 5% of each friend's subscription amount for as long as they are subscribed."
                 )
             }
         }
@@ -184,7 +218,9 @@ struct ReferralView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    private func stepView(number: String, title: String, description: String) -> some View {
+    private func stepView(number: String, title: String, description: String)
+        -> some View
+    {
         VStack(alignment: .leading, spacing: 4) {
             Text("\(number). \(title)")
                 .font(.subheadline)

@@ -13,10 +13,16 @@ enum Route: Hashable {
     case help
     case settings
     case notification
+    case createClient
+//    case createInvoice
+//    case clientView
 }
 
 @Observable
 class Router {
+    static let shared = Router()
+    private init() {} // Makes the router class a singleton
+    
     var path = NavigationPath()
 
     func navigate(to route: Route) {
@@ -39,6 +45,9 @@ class Router {
         case .help: HelpView()
         case .settings: SettingView()
         case .notification: NotificationView()
+        case .createClient: CreateClientView(mode: .create, clients: .constant([]))
+//        case .createInvoice: CreateInvoiceView()
+//        case .clientView: ClientView(client: .constant(.mock))
         }
     }
 }

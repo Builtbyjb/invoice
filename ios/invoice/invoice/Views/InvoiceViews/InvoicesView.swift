@@ -13,31 +13,37 @@ enum InvoiceFormRoute: Hashable {
 }
 
 struct InvoicesView: View {
-    @State private var path = NavigationPath()
+    @State private var router = Router.shared
     @State private var invoices: [Invoice] = MockData.invoices
     @State private var clients: [Client] = MockData.clients
     @State private var showClientPicker: Bool = false
     @State private var selectedClientForInvoice: Client? = nil
     @State private var searchText: String = ""
-    
+    @State private var showSearchBar: Bool = false
+
     var filteredInvoices: [Invoice] {
         if searchText.isEmpty { return invoices }
         return invoices.filter {
-            $0.formattedInvoiceNumber.localizedCaseInsensitiveContains(searchText) ||
-            $0.client.name.localizedCaseInsensitiveContains(searchText) ||
-            $0.status.rawValue.localizedCaseInsensitiveContains(searchText)
+            $0.formattedInvoiceNumber.localizedCaseInsensitiveContains(
+                searchText
+            ) || $0.client.name.localizedCaseInsensitiveContains(searchText)
+                || $0.status.rawValue.localizedCaseInsensitiveContains(
+                    searchText
+                )
         }
     }
-    
+
     var body: some View {
-        NavigationStack(path: $path) {
+        NavigationStack(path: $router.path) {
             ScrollView {
                 VStack(spacing: 12) {
                     if filteredInvoices.isEmpty {
                         ContentUnavailableView(
                             "No Invoices",
                             systemImage: "doc.text.magnifyingglass",
-                            description: Text("Create your first invoice using the + button.")
+                            description: Text(
+                                "Create your first invoice using the + button."
+                            )
                         )
                         .padding(.top, 40)
                     } else {
@@ -53,40 +59,79 @@ struct InvoicesView: View {
                 .padding(.vertical, 8)
             }
             .navigationTitle("Invoices")
-            .navigationDestination(for: Invoice.self) { invoice in
-                InvoiceView(
-                    invoice: invoice,
-                    invoices: $invoices,
-                    clients: clients,
-                    onNavigate: { path.append($0) }
-                )
+            .navigationDestination(for: Route.self) { route in
+                router.switchView(route: route)
             }
-            .navigationDestination(for: InvoiceFormRoute.self) { route in
-                CreateInvoiceView(mode: route, clients: clients, invoices: $invoices) {
-                    path.removeLast()
-                }
-            }
-            .navigationDestination(for: ClientFormRoute.self) { route in
-                CreateClientView(mode: route, clients: $clients) {
-                    path.removeLast()
-                }
-            }
+//            .navigationDestination(for: Invoice.self) { invoice in
+//                //                InvoiceView(
+//                //                    invoice: invoice,
+//                //                    invoices: $invoices,
+//                //                    clients: clients,
+//                ////                    onNavigate: { router.navigate(to: .help) }
+//                //                )
+//            }
+//            .navigationDestination(for: InvoiceFormRoute.self) { route in
+//                CreateInvoiceView(
+//                    mode: route,
+//                    clients: clients,
+//                    invoices: $invoices
+//                ) {
+//                    //                    path.removeLast()
+//                }
+//            }
+//            .navigationDestination(for: ClientFormRoute.self) { route in
+//                //                CreateClientView(mode: route, clients: $clients) {
+//                //                    path.removeLast()
+//                //                }
+//            }
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItemGroup(placement: .topBarLeading) {
                     Button {
                         if clients.isEmpty {
-                            path.append(ClientFormRoute.create)
+                            //                            router.navigate(to: (ClientFormRoute.create)
                         } else {
                             selectedClientForInvoice = clients.first
                             showClientPicker = true
                         }
                     } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title2)
+                        Image(systemName: "plus")
+                    }
+                    Button {
+                        showSearchBar.toggle()
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                }
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    ControlGroup {
+                        Button(action: {
+                            router.navigate(to: .help)
+                        }) {
+                            Image(systemName: "questionmark.circle")
+                        }
+                        Button(action: {
+                            router.navigate(to: .notification)
+                        }) {
+                            Image(systemName: "bell")
+                        }
+                        Button(action: {
+                            router.navigate(to: .settings)
+
+                        }) {
+                            Image(systemName: "gear")
+                        }
                     }
                 }
             }
-            .searchable(text: $searchText, prompt: "Search invoices")
+            .safeAreaInset(edge: .bottom) {
+                if showSearchBar {
+                    SearchBarView(
+                        showSearchBar: $showSearchBar,
+                        searchText: $searchText,
+                        placeholder: "Search Invoices"
+                    )
+                }
+            }
             .sheet(isPresented: $showClientPicker) {
                 ClientPickerSheet(
                     clients: clients,
@@ -94,12 +139,12 @@ struct InvoicesView: View {
                     onContinue: {
                         showClientPicker = false
                         if let client = selectedClientForInvoice {
-                            path.append(InvoiceFormRoute.create(client))
+                            //                            path.append(InvoiceFormRoute.create(client))
                         }
                     },
                     onCreateClient: {
                         showClientPicker = false
-                        path.append(ClientFormRoute.create)
+                        //                        path.append(ClientFormRoute.create)
                     }
                 )
             }
@@ -109,36 +154,38 @@ struct InvoicesView: View {
 
 struct InvoiceListCard: View {
     let invoice: Invoice
-    
+
     var body: some View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(invoice.formattedInvoiceNumber)
                     .font(.headline)
-                
+
                 Text(invoice.client.name)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
-                
+
                 HStack(spacing: 6) {
                     StatusBadge(status: invoice.status)
-                    
+
                     Text("Due \(invoice.dueDate, style: .date)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
             }
-            
+
             Spacer()
-            
+
             VStack(alignment: .trailing, spacing: 4) {
                 Text("\(invoice.grandTotal, format: .currency(code: "USD"))")
                     .font(.headline)
-                Text("\(invoice.lineItems.count) item\(invoice.lineItems.count == 1 ? "" : "s")")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                Text(
+                    "\(invoice.lineItems.count) item\(invoice.lineItems.count == 1 ? "" : "s")"
+                )
+                .font(.caption)
+                .foregroundColor(.secondary)
             }
-            
+
             Image(systemName: "chevron.right")
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -156,7 +203,7 @@ struct ClientPickerSheet: View {
     let onContinue: () -> Void
     let onCreateClient: () -> Void
     @Environment(\.dismiss) private var dismiss
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -168,7 +215,7 @@ struct ClientPickerSheet: View {
                     }
                     .pickerStyle(.inline)
                 }
-                
+
                 Section {
                     Button {
                         onContinue()
@@ -179,7 +226,7 @@ struct ClientPickerSheet: View {
                     }
                     .disabled(selectedClient == nil)
                 }
-                
+
                 Section {
                     Button {
                         onCreateClient()
