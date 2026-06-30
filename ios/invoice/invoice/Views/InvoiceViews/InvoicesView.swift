@@ -62,28 +62,28 @@ struct InvoicesView: View {
             .navigationDestination(for: Route.self) { route in
                 router.switchView(route: route)
             }
-//            .navigationDestination(for: Invoice.self) { invoice in
-//                //                InvoiceView(
-//                //                    invoice: invoice,
-//                //                    invoices: $invoices,
-//                //                    clients: clients,
-//                ////                    onNavigate: { router.navigate(to: .help) }
-//                //                )
-//            }
-//            .navigationDestination(for: InvoiceFormRoute.self) { route in
-//                CreateInvoiceView(
-//                    mode: route,
-//                    clients: clients,
-//                    invoices: $invoices
-//                ) {
-//                    //                    path.removeLast()
-//                }
-//            }
-//            .navigationDestination(for: ClientFormRoute.self) { route in
-//                //                CreateClientView(mode: route, clients: $clients) {
-//                //                    path.removeLast()
-//                //                }
-//            }
+            //            .navigationDestination(for: Invoice.self) { invoice in
+            //                //                InvoiceView(
+            //                //                    invoice: invoice,
+            //                //                    invoices: $invoices,
+            //                //                    clients: clients,
+            //                ////                    onNavigate: { router.navigate(to: .help) }
+            //                //                )
+            //            }
+            //            .navigationDestination(for: InvoiceFormRoute.self) { route in
+            //                CreateInvoiceView(
+            //                    mode: route,
+            //                    clients: clients,
+            //                    invoices: $invoices
+            //                ) {
+            //                    //                    path.removeLast()
+            //                }
+            //            }
+            //            .navigationDestination(for: ClientFormRoute.self) { route in
+            //                //                CreateClientView(mode: route, clients: $clients) {
+            //                //                    path.removeLast()
+            //                //                }
+            //            }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Button {
@@ -192,8 +192,12 @@ struct InvoiceListCard: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 16)) // 2. Add border radius
+        .overlay(
+            RoundedRectangle(cornerRadius: 16) // 3. Match the shape for the border
+                .stroke(Color.black.opacity(0.05), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
 }
 

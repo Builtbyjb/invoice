@@ -93,11 +93,7 @@ struct ClientsView: View {
 
             }.safeAreaInset(edge: .bottom) {
                 if showSearchBar {
-                    SearchBarView(
-                        showSearchBar: $showSearchBar,
-                        searchText: $searchText,
-                        placeholder: "Search clients"
-                    )
+                    SearchBarView(showSearchBar: $showSearchBar, searchText: $searchText, placeholder: "Search clients")
                 }
             }
         }

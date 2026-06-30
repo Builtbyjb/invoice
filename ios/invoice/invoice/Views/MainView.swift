@@ -14,7 +14,6 @@ enum AuthState {
 
 struct MainView: View {
     @State private var authState: AuthState = .undefined
-//    @State private var router = Router()
 
     var body: some View {
         Group {
@@ -30,35 +29,9 @@ struct MainView: View {
                             print(error.localizedDescription)
                         }
                     }
-                case .authenticating:
-                    ProgressView()
-                case .authenticated:
-                    ContentView()
-//                        .navigationDestination(for: Route.self){ route in
-//                    }.toolbar{
-//                        ToolbarItemGroup(placement: .topBarTrailing) {
-//                            ControlGroup {
-//                                Button(action: {
-//                                    router.navigate(to: .help)
-//                                }) {
-//                                    Image(systemName: "questionmark.circle")
-//                                }
-//                                Button(action: {
-//                                    router.navigate(to: .notification)
-//                                }) {
-//                                    Image(systemName: "bell")
-//                                }
-//                                Button(action: {
-//                                    router.navigate(to: .settings)
-//                                    
-//                                }) {
-//                                    Image(systemName: "gear")
-//                                }
-//                            }
-//                        }
-//                    }
-                case .notAuthenticated:
-                    AuthView()
+                case .authenticating: ProgressView()
+                case .authenticated: ContentView()
+                case .notAuthenticated: AuthView()
                 }
 
             }

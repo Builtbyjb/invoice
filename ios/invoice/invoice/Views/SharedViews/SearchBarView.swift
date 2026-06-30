@@ -35,6 +35,11 @@ struct SearchBarView: View {
             }
             .padding()
             .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 32))
+            .clipShape(RoundedRectangle(cornerRadius: 32)) // 2. Add border radius
+            .overlay(
+                RoundedRectangle(cornerRadius: 32) // 3. Match the shape for the border
+                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
+            )
             .shadow(
                 color: .black.opacity(0.15),
                 radius: 8,
@@ -53,6 +58,11 @@ struct SearchBarView: View {
             .buttonStyle(.glass)
             .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 32))
             .buttonBorderShape(.roundedRectangle(radius: 32))
+            .clipShape(RoundedRectangle(cornerRadius: 32)) // 2. Add border radius
+            .overlay(
+                RoundedRectangle(cornerRadius: 32) // 3. Match the shape for the border
+                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
+            )
             .shadow(
                 color: .black.opacity(0.15),
                 radius: 8,

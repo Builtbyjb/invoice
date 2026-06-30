@@ -44,7 +44,11 @@ struct ClientCard: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
+        .clipShape(RoundedRectangle(cornerRadius: 16)) // 2. Add border radius
+        .overlay(
+            RoundedRectangle(cornerRadius: 16) // 3. Match the shape for the border
+                .stroke(Color.black.opacity(0.05), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
 }

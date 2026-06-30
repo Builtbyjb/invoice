@@ -51,6 +51,7 @@ struct ReferralView: View {
                 }
                 .padding()
             }
+            .navigationTitle("Referral")
             .navigationDestination(for: Route.self) { route in
                 router.switchView(route: route)
             }

@@ -33,4 +33,6 @@ xcodebuild -create-xcframework \
     -output "${OUTDIR}/${XCFRAMEWORK_NAME}"
 
 echo "Copying Swift bindings..."
+#  Remove old bindings first
+rm -rf "${OUTDIR}/invoice/core_lib.swift"
 cp "${BINDINGS_DIR}/core_lib.swift" "${OUTDIR}/invoice/core_lib.swift"
