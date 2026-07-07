@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct StatusChartView: View {
-    let statusCounts: [InvoiceStatusCount]
+    let statusCounts = fetchDashboard().invoicesStatus
     let isLoading: Bool
 
     private func statusColor(_ status: String) -> Color {
@@ -118,6 +118,5 @@ struct StatusChartView: View {
 }
 
 #Preview {
-    StatusChartView(statusCounts: InvoiceStatusCount.placeholderData, isLoading: false)
-        .padding()
+    StatusChartView(isLoading: false).padding()
 }

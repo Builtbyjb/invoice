@@ -10,6 +10,7 @@ import SwiftUI
 struct CreateClientView: View {
     let mode: ClientFormRoute
     @Binding var clients: [Client]
+    @Environment(\.dismiss) var dismiss
 
     @State private var name: String = ""
     @State private var email: String = ""
@@ -92,7 +93,7 @@ struct CreateClientView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button {
-//                    onComplete()
+                    dismiss()
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 17, weight: .semibold))
@@ -122,12 +123,15 @@ struct CreateClientView: View {
             switch mode {
             case .create:
                 let newClient = Client(
+                    id: "1",
+                    organizationId: 1,
                     name: name,
                     email: email,
                     phone: phone,
                     address: address,
                     city: city,
-                    country: country
+                    country: country,
+                    createdAt: Date().ISO8601Format()
                 )
                 clients.append(newClient)
             case .edit(let existing):
@@ -143,7 +147,7 @@ struct CreateClientView: View {
                 }
             }
             isSaving = false
-//            onComplete()
+            dismiss()
         }
     }
 }

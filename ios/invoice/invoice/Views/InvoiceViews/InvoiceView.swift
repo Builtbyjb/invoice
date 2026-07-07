@@ -13,7 +13,8 @@ struct InvoiceView: View {
     let invoice: Invoice
     @Binding var invoices: [Invoice]
     let clients: [Client]
-    let onNavigate: (any Hashable) -> Void
+    
+    @Environment(Router.self) var router
     
     @State private var showPDFPreview: Bool = false
     @State private var showPDFShare: Bool = false
@@ -37,14 +38,12 @@ struct InvoiceView: View {
             .padding()
         }
         .navigationTitle(invoice.formattedInvoiceNumber)
-        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    onNavigate(InvoiceFormRoute.edit(invoice))
+                    router.path.append(InvoiceFormRoute.edit(invoice))
                 } label: {
                     Image(systemName: "square.and.pencil")
-                        .font(.system(size: 17, weight: .semibold))
                 }
             }
         }
@@ -59,8 +58,6 @@ struct InvoiceView: View {
             }
         }
     }
-    
-    // MARK: - Header Actions
     
     private var headerActions: some View {
         HStack(spacing: 12) {
@@ -89,8 +86,6 @@ struct InvoiceView: View {
             Spacer()
         }
     }
-    
-    // MARK: - Client Info
     
     private var clientInfoCard: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -125,15 +120,13 @@ struct InvoiceView: View {
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
     
-    // MARK: - Meta Info
-    
     private var metaInfoCard: some View {
         HStack(spacing: 0) {
             MetaItem(label: "Status", value: invoice.status.rawValue, valueColor: statusColor)
             Divider()
-            MetaItem(label: "Issue Date", value: invoice.issueDate.formatted(date: .abbreviated, time: .omitted))
+            MetaItem(label: "Issue Date", value: invoice.issueDateValue.formatted(date: .abbreviated, time: .omitted))
             Divider()
-            MetaItem(label: "Due Date", value: invoice.dueDate.formatted(date: .abbreviated, time: .omitted))
+            MetaItem(label: "Due Date", value: invoice.dueDateValue.formatted(date: .abbreviated, time: .omitted))
         }
         .padding()
         .background(Color(.systemBackground))
@@ -144,13 +137,11 @@ struct InvoiceView: View {
     private var statusColor: Color {
         switch invoice.status {
         case .draft: return .gray
-        case .sent: return .blue
+        case .pending: return .blue
         case .paid: return .green
         case .overdue: return .red
         }
     }
-    
-    // MARK: - Line Items
     
     private var lineItemsCard: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -211,8 +202,6 @@ struct InvoiceView: View {
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
     
-    // MARK: - Summary
-    
     private var summaryCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Summary")
@@ -240,8 +229,6 @@ struct InvoiceView: View {
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
     
-    // MARK: - Notes
-    
     private var notesCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Notes")
@@ -260,7 +247,6 @@ struct InvoiceView: View {
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
     
-    // MARK: - Signature
     
     private var signatureCard: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -278,7 +264,6 @@ struct InvoiceView: View {
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
     
-    // MARK: - PDF Generation
     
     private func generatePDF(preview: Bool) {
         guard let data = InvoicePDFGenerator.generatePDF(for: invoice) else { return }
@@ -299,8 +284,6 @@ struct InvoiceView: View {
         }
     }
 }
-
-// MARK: - Helper Views
 
 struct MetaItem: View {
     let label: String
@@ -338,8 +321,6 @@ struct SummaryRow: View {
     }
 }
 
-// MARK: - PDF Preview (QLPreviewController)
-
 struct PDFPreviewView: UIViewControllerRepresentable {
     let url: URL
     
@@ -372,8 +353,6 @@ struct PDFPreviewView: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - Share Sheet
-
 struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
     let applicationActivities: [UIActivity]? = nil
@@ -388,10 +367,9 @@ struct ShareSheet: UIViewControllerRepresentable {
 #Preview {
     NavigationStack {
         InvoiceView(
-            invoice: MockData.invoices[0],
-            invoices: .constant(MockData.invoices),
-            clients: MockData.clients,
-            onNavigate: { _ in }
+            invoice: fetchInvoices()[0],
+            invoices: .constant(fetchInvoices()),
+            clients: fetchClients(),
         )
-    }
+    }.environment(Router.shared)
 }

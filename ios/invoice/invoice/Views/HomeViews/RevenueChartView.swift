@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct RevenueChartView: View {
-    let monthlyRevenue: [MonthlyRevenue]
+    let monthlyRevenue = fetchDashboard().monthlyRevenue
     let isLoading: Bool
 
     @State private var selectedYear = "Lifetime"
@@ -40,7 +40,7 @@ struct RevenueChartView: View {
     private var aggregatedData: [MonthlyRevenueAggregate] {
         let grouped = Dictionary(grouping: filteredData) { $0.month }
         return grouped.map { month, items in
-            let total = items.reduce(0) { $0 + $1.amount }
+            let total = items.reduce(0.0) { $0 + Double($1.amount) }
             return MonthlyRevenueAggregate(month: month, amount: total)
         }.sorted { monthOrder($0.month) < monthOrder($1.month) }
     }
@@ -189,8 +189,6 @@ struct RevenueChartView: View {
     }
 }
 
-// MARK: - Helper Model for Aggregated Data
-
 struct MonthlyRevenueAggregate: Identifiable {
     let id = UUID()
     let month: String
@@ -198,6 +196,5 @@ struct MonthlyRevenueAggregate: Identifiable {
 }
 
 #Preview {
-    RevenueChartView(monthlyRevenue: MonthlyRevenue.placeholderData, isLoading: false)
-        .padding()
+    RevenueChartView(isLoading: false).padding()
 }

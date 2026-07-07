@@ -26,12 +26,12 @@ struct ClientCard: View {
                     .font(.headline)
                     .foregroundColor(.primary)
                 
-                Text(client.displayContact)
+                Text(!client.email.isEmpty ? client.email: client.phone)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .lineLimit(1)
                 
-                Text(client.displayLocation)
+                Text("\(client.city),\(client.country)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

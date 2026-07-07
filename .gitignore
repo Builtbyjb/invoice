@@ -5,6 +5,10 @@ core-lib/bindings/
 core-lib/Cargo.lock
 *.rs.bk
 
+# Zig
+.zig-cache/
+**/zig-out/
+
 # iOS generated artifacts
 ios/invoice/core_lib.xcframework/
 ios/invoice/invoice/core_lib.swift

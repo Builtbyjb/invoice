@@ -1,0 +1,1294 @@
+{
+  "clients": [
+    {
+      "address": "100 King St W",
+      "city": "Toronto",
+      "country": "Canada",
+      "created_at": "2026-01-01T09:00:00Z",
+      "email": "contact@acme.com",
+      "id": "client_001",
+      "name": "Acme Corporation",
+      "organization_id": 1,
+      "phone": "+1-416-555-1001"
+    },
+    {
+      "address": "220 Bay St",
+      "city": "Toronto",
+      "country": "Canada",
+      "created_at": "2026-01-02T09:00:00Z",
+      "email": "hello@northwind.ca",
+      "id": "client_002",
+      "name": "Northwind Traders",
+      "organization_id": 1,
+      "phone": "+1-416-555-1002"
+    },
+    {
+      "address": "15 Front St E",
+      "city": "Toronto",
+      "country": "Canada",
+      "created_at": "2026-01-03T09:00:00Z",
+      "email": "info@globex.com",
+      "id": "client_003",
+      "name": "Globex Inc.",
+      "organization_id": 1,
+      "phone": "+1-416-555-1003"
+    },
+    {
+      "address": "45 Adelaide St",
+      "city": "Toronto",
+      "country": "Canada",
+      "created_at": "2026-01-04T09:00:00Z",
+      "email": "support@initech.com",
+      "id": "client_004",
+      "name": "Initech",
+      "organization_id": 1,
+      "phone": "+1-416-555-1004"
+    },
+    {
+      "address": "88 Queen St",
+      "city": "Toronto",
+      "country": "Canada",
+      "created_at": "2026-01-05T09:00:00Z",
+      "email": "sales@umbrella.com",
+      "id": "client_005",
+      "name": "Umbrella Group",
+      "organization_id": 1,
+      "phone": "+1-416-555-1005"
+    },
+    {
+      "address": "12 Richmond St",
+      "city": "Toronto",
+      "country": "Canada",
+      "created_at": "2026-01-06T09:00:00Z",
+      "email": "contact@wayne.com",
+      "id": "client_006",
+      "name": "Wayne Enterprises",
+      "organization_id": 1,
+      "phone": "+1-416-555-1006"
+    },
+    {
+      "address": "500 Georgia St",
+      "city": "Vancouver",
+      "country": "Canada",
+      "created_at": "2026-01-07T09:00:00Z",
+      "email": "info@stark.com",
+      "id": "client_007",
+      "name": "Stark Industries",
+      "organization_id": 2,
+      "phone": "+1-604-555-1007"
+    },
+    {
+      "address": "101 Granville St",
+      "city": "Vancouver",
+      "country": "Canada",
+      "created_at": "2026-01-08T09:00:00Z",
+      "email": "hello@wonka.com",
+      "id": "client_008",
+      "name": "Wonka Foods",
+      "organization_id": 2,
+      "phone": "+1-604-555-1008"
+    },
+    {
+      "address": "88 Robson St",
+      "city": "Vancouver",
+      "country": "Canada",
+      "created_at": "2026-01-09T09:00:00Z",
+      "email": "admin@hooli.com",
+      "id": "client_009",
+      "name": "Hooli",
+      "organization_id": 2,
+      "phone": "+1-604-555-1009"
+    },
+    {
+      "address": "700 Burrard St",
+      "city": "Vancouver",
+      "country": "Canada",
+      "created_at": "2026-01-10T09:00:00Z",
+      "email": "team@piedpiper.io",
+      "id": "client_010",
+      "name": "Pied Piper",
+      "organization_id": 2,
+      "phone": "+1-604-555-1010"
+    },
+    {
+      "address": "50 Rue Sainte-Catherine",
+      "city": "Montreal",
+      "country": "Canada",
+      "created_at": "2026-01-11T09:00:00Z",
+      "email": "info@soylent.com",
+      "id": "client_011",
+      "name": "Soylent Corp",
+      "organization_id": 3,
+      "phone": "+1-514-555-1011"
+    },
+    {
+      "address": "99 Sherbrooke St",
+      "city": "Montreal",
+      "country": "Canada",
+      "created_at": "2026-01-12T09:00:00Z",
+      "email": "contact@cyberdyne.com",
+      "id": "client_012",
+      "name": "Cyberdyne Systems",
+      "organization_id": 3,
+      "phone": "+1-514-555-1012"
+    },
+    {
+      "address": "18 Peel St",
+      "city": "Montreal",
+      "country": "Canada",
+      "created_at": "2026-01-13T09:00:00Z",
+      "email": "hello@oscorp.com",
+      "id": "client_013",
+      "name": "Oscorp",
+      "organization_id": 3,
+      "phone": "+1-514-555-1013"
+    },
+    {
+      "address": "500 René-Lévesque Blvd",
+      "city": "Montreal",
+      "country": "Canada",
+      "created_at": "2026-01-14T09:00:00Z",
+      "email": "support@tyrell.com",
+      "id": "client_014",
+      "name": "Tyrell Corporation",
+      "organization_id": 3,
+      "phone": "+1-514-555-1014"
+    },
+    {
+      "address": "80 8 Ave SW",
+      "city": "Calgary",
+      "country": "Canada",
+      "created_at": "2026-01-15T09:00:00Z",
+      "email": "admin@blackmesa.com",
+      "id": "client_015",
+      "name": "Black Mesa",
+      "organization_id": 4,
+      "phone": "+1-403-555-1015"
+    },
+    {
+      "address": "25 Stephen Ave",
+      "city": "Calgary",
+      "country": "Canada",
+      "created_at": "2026-01-16T09:00:00Z",
+      "email": "lab@aperture.com",
+      "id": "client_016",
+      "name": "Aperture Science",
+      "organization_id": 4,
+      "phone": "+1-403-555-1016"
+    },
+    {
+      "address": "120 Centre St",
+      "city": "Calgary",
+      "country": "Canada",
+      "created_at": "2026-01-17T09:00:00Z",
+      "email": "sales@lexcorp.com",
+      "id": "client_017",
+      "name": "LexCorp",
+      "organization_id": 4,
+      "phone": "+1-403-555-1017"
+    },
+    {
+      "address": "10 4 Ave SW",
+      "city": "Calgary",
+      "country": "Canada",
+      "created_at": "2026-01-18T09:00:00Z",
+      "email": "info@massivedynamic.com",
+      "id": "client_018",
+      "name": "Massive Dynamic",
+      "organization_id": 4,
+      "phone": "+1-403-555-1018"
+    },
+    {
+      "address": "90 Wellington St",
+      "city": "Ottawa",
+      "country": "Canada",
+      "created_at": "2026-01-19T09:00:00Z",
+      "email": "contact@vehement.com",
+      "id": "client_019",
+      "name": "Vehement Capital",
+      "organization_id": 5,
+      "phone": "+1-613-555-1019"
+    },
+    {
+      "address": "55 Elgin St",
+      "city": "Ottawa",
+      "country": "Canada",
+      "created_at": "2026-01-20T09:00:00Z",
+      "email": "hello@blueyonder.com",
+      "id": "client_020",
+      "name": "Blue Yonder",
+      "organization_id": 5,
+      "phone": "+1-613-555-1020"
+    },
+    {
+      "address": "120 Bank St",
+      "city": "Ottawa",
+      "country": "Canada",
+      "created_at": "2026-01-21T09:00:00Z",
+      "email": "info@quantumlabs.com",
+      "id": "client_021",
+      "name": "Quantum Labs",
+      "organization_id": 5,
+      "phone": "+1-613-555-1021"
+    },
+    {
+      "address": "200 Rideau St",
+      "city": "Ottawa",
+      "country": "Canada",
+      "created_at": "2026-01-22T09:00:00Z",
+      "email": "support@fusiontech.com",
+      "id": "client_022",
+      "name": "Fusion Tech",
+      "organization_id": 5,
+      "phone": "+1-613-555-1022"
+    },
+    {
+      "address": "75 Spring Garden Rd",
+      "city": "Halifax",
+      "country": "Canada",
+      "created_at": "2026-01-23T09:00:00Z",
+      "email": "contact@evergreen.com",
+      "id": "client_023",
+      "name": "Evergreen Solutions",
+      "organization_id": 6,
+      "phone": "+1-902-555-1023"
+    },
+    {
+      "address": "30 Barrington St",
+      "city": "Halifax",
+      "country": "Canada",
+      "created_at": "2026-01-24T09:00:00Z",
+      "email": "info@mapleinnovations.ca",
+      "id": "client_024",
+      "name": "Maple Innovations",
+      "organization_id": 6,
+      "phone": "+1-902-555-1024"
+    },
+    {
+      "address": "200 Hollis St",
+      "city": "Halifax",
+      "country": "Canada",
+      "created_at": "2026-01-25T09:00:00Z",
+      "email": "hello@novasystems.ca",
+      "id": "client_025",
+      "name": "Nova Systems",
+      "organization_id": 6,
+      "phone": "+1-902-555-1025"
+    },
+    {
+      "address": "100 2nd Ave",
+      "city": "Saskatoon",
+      "country": "Canada",
+      "created_at": "2026-01-26T09:00:00Z",
+      "email": "sales@prairiesoftware.ca",
+      "id": "client_026",
+      "name": "Prairie Software",
+      "organization_id": 6,
+      "phone": "+1-306-555-1026"
+    },
+    {
+      "address": "400 Main St",
+      "city": "Winnipeg",
+      "country": "Canada",
+      "created_at": "2026-01-27T09:00:00Z",
+      "email": "info@northernlogistics.ca",
+      "id": "client_027",
+      "name": "Northern Logistics",
+      "organization_id": 7,
+      "phone": "+1-204-555-1027"
+    },
+    {
+      "address": "50 Portage Ave",
+      "city": "Winnipeg",
+      "country": "Canada",
+      "created_at": "2026-01-28T09:00:00Z",
+      "email": "contact@polarenergy.ca",
+      "id": "client_028",
+      "name": "Polar Energy",
+      "organization_id": 7,
+      "phone": "+1-204-555-1028"
+    },
+    {
+      "address": "300 Graham Ave",
+      "city": "Winnipeg",
+      "country": "Canada",
+      "created_at": "2026-01-29T09:00:00Z",
+      "email": "hello@redwoodconsulting.ca",
+      "id": "client_029",
+      "name": "Redwood Consulting",
+      "organization_id": 7,
+      "phone": "+1-204-555-1029"
+    },
+    {
+      "address": "15 Broadway",
+      "city": "Winnipeg",
+      "country": "Canada",
+      "created_at": "2026-01-30T09:00:00Z",
+      "email": "team@auroradigital.ca",
+      "id": "client_030",
+      "name": "Aurora Digital",
+      "organization_id": 7,
+      "phone": "+1-204-555-1030"
+    }
+  ],
+  "dashboard": {
+    "dashboard_stats": {
+      "currency": "USD",
+      "overdue_count": 5,
+      "paid_count": 48,
+      "pending_count": 12,
+      "total_revenue": 125000.0
+    },
+    "invoices_status": [
+      {
+        "count": 48,
+        "id": "some-id-01",
+        "status": "Paid"
+      },
+      {
+        "count": 25,
+        "id": "some-id-02",
+        "status": "Sent"
+      },
+      {
+        "count": 15,
+        "id": "some-id-03",
+        "status": "Draft"
+      },
+      {
+        "count": 5,
+        "id": "some-id-04",
+        "status": "Overdue"
+      }
+    ],
+    "monthly_revenue": [
+      {
+        "amount": 12000,
+        "currency": "USD",
+        "month": "Jan",
+        "year": 2026
+      },
+      {
+        "amount": 8500,
+        "currency": "EUR",
+        "month": "Jan",
+        "year": 2026
+      },
+      {
+        "amount": 6200,
+        "currency": "GBP",
+        "month": "Jan",
+        "year": 2026
+      },
+      {
+        "amount": 150000,
+        "currency": "NGN",
+        "month": "Jan",
+        "year": 2026
+      },
+      {
+        "amount": 15000,
+        "currency": "USD",
+        "month": "Feb",
+        "year": 2026
+      },
+      {
+        "amount": 9200,
+        "currency": "EUR",
+        "month": "Feb",
+        "year": 2026
+      },
+      {
+        "amount": 7100,
+        "currency": "GBP",
+        "month": "Feb",
+        "year": 2026
+      },
+      {
+        "amount": 175000,
+        "currency": "NGN",
+        "month": "Feb",
+        "year": 2026
+      },
+      {
+        "amount": 18000,
+        "currency": "USD",
+        "month": "Mar",
+        "year": 2026
+      },
+      {
+        "amount": 11000,
+        "currency": "EUR",
+        "month": "Mar",
+        "year": 2026
+      },
+      {
+        "amount": 8000,
+        "currency": "GBP",
+        "month": "Mar",
+        "year": 2026
+      },
+      {
+        "amount": 200000,
+        "currency": "NGN",
+        "month": "Mar",
+        "year": 2026
+      },
+      {
+        "amount": 22000,
+        "currency": "USD",
+        "month": "Apr",
+        "year": 2026
+      },
+      {
+        "amount": 13500,
+        "currency": "EUR",
+        "month": "Apr",
+        "year": 2026
+      },
+      {
+        "amount": 9500,
+        "currency": "GBP",
+        "month": "Apr",
+        "year": 2026
+      },
+      {
+        "amount": 225000,
+        "currency": "NGN",
+        "month": "Apr",
+        "year": 2026
+      },
+      {
+        "amount": 19500,
+        "currency": "USD",
+        "month": "May",
+        "year": 2026
+      },
+      {
+        "amount": 12000,
+        "currency": "EUR",
+        "month": "May",
+        "year": 2026
+      },
+      {
+        "amount": 8700,
+        "currency": "GBP",
+        "month": "May",
+        "year": 2026
+      },
+      {
+        "amount": 210000,
+        "currency": "NGN",
+        "month": "May",
+        "year": 2026
+      },
+      {
+        "amount": 25000,
+        "currency": "USD",
+        "month": "Jun",
+        "year": 2026
+      },
+      {
+        "amount": 15500,
+        "currency": "EUR",
+        "month": "Jun",
+        "year": 2026
+      },
+      {
+        "amount": 11000,
+        "currency": "GBP",
+        "month": "Jun",
+        "year": 2026
+      },
+      {
+        "amount": 250000,
+        "currency": "NGN",
+        "month": "Jun",
+        "year": 2026
+      },
+      {
+        "amount": 10000,
+        "currency": "USD",
+        "month": "Jan",
+        "year": 2025
+      },
+      {
+        "amount": 7200,
+        "currency": "EUR",
+        "month": "Jan",
+        "year": 2025
+      },
+      {
+        "amount": 5400,
+        "currency": "GBP",
+        "month": "Jan",
+        "year": 2025
+      },
+      {
+        "amount": 130000,
+        "currency": "NGN",
+        "month": "Jan",
+        "year": 2025
+      },
+      {
+        "amount": 11500,
+        "currency": "USD",
+        "month": "Feb",
+        "year": 2025
+      },
+      {
+        "amount": 8000,
+        "currency": "EUR",
+        "month": "Feb",
+        "year": 2025
+      },
+      {
+        "amount": 6000,
+        "currency": "GBP",
+        "month": "Feb",
+        "year": 2025
+      },
+      {
+        "amount": 145000,
+        "currency": "NGN",
+        "month": "Feb",
+        "year": 2025
+      },
+      {
+        "amount": 13000,
+        "currency": "USD",
+        "month": "Mar",
+        "year": 2025
+      },
+      {
+        "amount": 8800,
+        "currency": "EUR",
+        "month": "Mar",
+        "year": 2025
+      },
+      {
+        "amount": 6700,
+        "currency": "GBP",
+        "month": "Mar",
+        "year": 2025
+      },
+      {
+        "amount": 160000,
+        "currency": "NGN",
+        "month": "Mar",
+        "year": 2025
+      },
+      {
+        "amount": 14500,
+        "currency": "USD",
+        "month": "Apr",
+        "year": 2025
+      },
+      {
+        "amount": 9500,
+        "currency": "EUR",
+        "month": "Apr",
+        "year": 2025
+      },
+      {
+        "amount": 7200,
+        "currency": "GBP",
+        "month": "Apr",
+        "year": 2025
+      },
+      {
+        "amount": 175000,
+        "currency": "NGN",
+        "month": "Apr",
+        "year": 2025
+      },
+      {
+        "amount": 16000,
+        "currency": "USD",
+        "month": "May",
+        "year": 2025
+      },
+      {
+        "amount": 10200,
+        "currency": "EUR",
+        "month": "May",
+        "year": 2025
+      },
+      {
+        "amount": 7800,
+        "currency": "GBP",
+        "month": "May",
+        "year": 2025
+      },
+      {
+        "amount": 190000,
+        "currency": "NGN",
+        "month": "May",
+        "year": 2025
+      },
+      {
+        "amount": 17500,
+        "currency": "USD",
+        "month": "Jun",
+        "year": 2025
+      },
+      {
+        "amount": 11000,
+        "currency": "EUR",
+        "month": "Jun",
+        "year": 2025
+      },
+      {
+        "amount": 8300,
+        "currency": "GBP",
+        "month": "Jun",
+        "year": 2025
+      },
+      {
+        "amount": 200000,
+        "currency": "NGN",
+        "month": "Jun",
+        "year": 2025
+      }
+    ]
+  },
+  "invoices": [
+    {
+      "client_id": "client_001",
+      "created_at": "2026-01-02T09:00:00Z",
+      "currency": "CAD",
+      "discount": 50.0,
+      "due_date": "2026-02-01",
+      "id": "inv_0001",
+      "invoice_number": "INV-2026-0001",
+      "issue_date": "2026-01-02",
+      "items": [
+        {
+          "description": "Website Design",
+          "price": 1200.0,
+          "quantity": 1
+        }
+      ],
+      "notes": "Paid via bank transfer.",
+      "signature": "John Doe",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_002",
+      "created_at": "2026-01-05T11:20:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-02-04",
+      "id": "inv_0002",
+      "invoice_number": "INV-2026-0002",
+      "issue_date": "2026-01-05",
+      "items": [
+        {
+          "description": "SEO Services",
+          "price": 450.0,
+          "quantity": 2
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Pending",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_003",
+      "created_at": "2026-01-07T14:00:00Z",
+      "currency": "CAD",
+      "discount": 500.0,
+      "due_date": "2026-02-06",
+      "id": "inv_0003",
+      "invoice_number": "INV-2026-0003",
+      "issue_date": "2026-01-07",
+      "items": [
+        {
+          "description": "Mobile App Development",
+          "price": 8500.0,
+          "quantity": 1
+        }
+      ],
+      "notes": "Awaiting approval.",
+      "signature": null,
+      "status": "Draft",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_004",
+      "created_at": "2026-01-10T08:30:00Z",
+      "currency": "CAD",
+      "discount": 100.0,
+      "due_date": "2026-02-09",
+      "id": "inv_0004",
+      "invoice_number": "INV-2026-0004",
+      "issue_date": "2026-01-10",
+      "items": [
+        {
+          "description": "Cloud Hosting",
+          "price": 80.0,
+          "quantity": 12
+        }
+      ],
+      "notes": "Reminder sent.",
+      "signature": "Jane Smith",
+      "status": "Overdue",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_005",
+      "created_at": "2026-01-12T10:15:00Z",
+      "currency": "CAD",
+      "discount": 75.0,
+      "due_date": "2026-02-11",
+      "id": "inv_0005",
+      "invoice_number": "INV-2026-0005",
+      "issue_date": "2026-01-12",
+      "items": [
+        {
+          "description": "IT Consulting",
+          "price": 150.0,
+          "quantity": 10
+        }
+      ],
+      "notes": "",
+      "signature": "Michael Lee",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_006",
+      "created_at": "2026-01-15T09:30:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-02-14",
+      "id": "inv_0006",
+      "invoice_number": "INV-2026-0006",
+      "issue_date": "2026-01-15",
+      "items": [
+        {
+          "description": "Logo Design",
+          "price": 600.0,
+          "quantity": 1
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Pending",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_007",
+      "created_at": "2026-01-18T13:00:00Z",
+      "currency": "CAD",
+      "discount": 200.0,
+      "due_date": "2026-02-17",
+      "id": "inv_0007",
+      "invoice_number": "INV-2026-0007",
+      "issue_date": "2026-01-18",
+      "items": [
+        {
+          "description": "API Integration",
+          "price": 120.0,
+          "quantity": 20
+        }
+      ],
+      "notes": "",
+      "signature": "Sarah Brown",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_008",
+      "created_at": "2026-01-20T15:45:00Z",
+      "currency": "CAD",
+      "discount": 100.0,
+      "due_date": "2026-02-19",
+      "id": "inv_0008",
+      "invoice_number": "INV-2026-0008",
+      "issue_date": "2026-01-20",
+      "items": [
+        {
+          "description": "Database Migration",
+          "price": 2400.0,
+          "quantity": 1
+        }
+      ],
+      "notes": "Pending client review.",
+      "signature": null,
+      "status": "Draft",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_009",
+      "created_at": "2026-01-22T12:10:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-02-21",
+      "id": "inv_0009",
+      "invoice_number": "INV-2026-0009",
+      "issue_date": "2026-01-22",
+      "items": [
+        {
+          "description": "Content Writing",
+          "price": 45.0,
+          "quantity": 25
+        }
+      ],
+      "notes": "",
+      "signature": "Emily Davis",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_010",
+      "created_at": "2026-01-25T10:00:00Z",
+      "currency": "CAD",
+      "discount": 250.0,
+      "due_date": "2026-02-24",
+      "id": "inv_0010",
+      "invoice_number": "INV-2026-0010",
+      "issue_date": "2026-01-25",
+      "items": [
+        {
+          "description": "Marketing Campaign",
+          "price": 3500.0,
+          "quantity": 1
+        }
+      ],
+      "notes": "Second reminder issued.",
+      "signature": null,
+      "status": "Overdue",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_011",
+      "created_at": "2026-02-01T09:00:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-03-03",
+      "id": "inv_0011",
+      "invoice_number": "INV-2026-0011",
+      "issue_date": "2026-02-01",
+      "items": [
+        {
+          "description": "Security Audit",
+          "price": 1800.0,
+          "quantity": 1
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Pending",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_012",
+      "created_at": "2026-02-03T08:45:00Z",
+      "currency": "CAD",
+      "discount": 100.0,
+      "due_date": "2026-03-05",
+      "id": "inv_0012",
+      "invoice_number": "INV-2026-0012",
+      "issue_date": "2026-02-03",
+      "items": [
+        {
+          "description": "UX Research",
+          "price": 95.0,
+          "quantity": 15
+        }
+      ],
+      "notes": "",
+      "signature": "Alice",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_013",
+      "created_at": "2026-02-05T13:00:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-03-07",
+      "id": "inv_0013",
+      "invoice_number": "INV-2026-0013",
+      "issue_date": "2026-02-05",
+      "items": [
+        {
+          "description": "Video Editing",
+          "price": 110.0,
+          "quantity": 8
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Draft",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_014",
+      "created_at": "2026-02-08T09:20:00Z",
+      "currency": "CAD",
+      "discount": 20.0,
+      "due_date": "2026-03-10",
+      "id": "inv_0014",
+      "invoice_number": "INV-2026-0014",
+      "issue_date": "2026-02-08",
+      "items": [
+        {
+          "description": "Graphic Design",
+          "price": 70.0,
+          "quantity": 12
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Pending",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_015",
+      "created_at": "2026-02-10T16:30:00Z",
+      "currency": "CAD",
+      "discount": 150.0,
+      "due_date": "2026-03-12",
+      "id": "inv_0015",
+      "invoice_number": "INV-2026-0015",
+      "issue_date": "2026-02-10",
+      "items": [
+        {
+          "description": "Software License",
+          "price": 40.0,
+          "quantity": 30
+        }
+      ],
+      "notes": "",
+      "signature": "Robert",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_016",
+      "created_at": "2026-02-12T11:00:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-03-14",
+      "id": "inv_0016",
+      "invoice_number": "INV-2026-0016",
+      "issue_date": "2026-02-12",
+      "items": [
+        {
+          "description": "Maintenance",
+          "price": 200.0,
+          "quantity": 6
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Pending",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_017",
+      "created_at": "2026-02-15T09:00:00Z",
+      "currency": "CAD",
+      "discount": 50.0,
+      "due_date": "2026-03-17",
+      "id": "inv_0017",
+      "invoice_number": "INV-2026-0017",
+      "issue_date": "2026-02-15",
+      "items": [
+        {
+          "description": "Training",
+          "price": 900.0,
+          "quantity": 2
+        }
+      ],
+      "notes": "",
+      "signature": "David",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_018",
+      "created_at": "2026-02-18T10:30:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-03-20",
+      "id": "inv_0018",
+      "invoice_number": "INV-2026-0018",
+      "issue_date": "2026-02-18",
+      "items": [
+        {
+          "description": "AI Consultation",
+          "price": 500.0,
+          "quantity": 5
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Draft",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_019",
+      "created_at": "2026-02-20T14:15:00Z",
+      "currency": "CAD",
+      "discount": 100.0,
+      "due_date": "2026-03-22",
+      "id": "inv_0019",
+      "invoice_number": "INV-2026-0019",
+      "issue_date": "2026-02-20",
+      "items": [
+        {
+          "description": "Server Setup",
+          "price": 750.0,
+          "quantity": 3
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Pending",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_020",
+      "created_at": "2026-02-23T08:00:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-03-25",
+      "id": "inv_0020",
+      "invoice_number": "INV-2026-0020",
+      "issue_date": "2026-02-23",
+      "items": [
+        {
+          "description": "Email Hosting",
+          "price": 12.5,
+          "quantity": 24
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Overdue",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_021",
+      "created_at": "2026-02-25T15:30:00Z",
+      "currency": "CAD",
+      "discount": 120.0,
+      "due_date": "2026-03-27",
+      "id": "inv_0021",
+      "invoice_number": "INV-2026-0021",
+      "issue_date": "2026-02-25",
+      "items": [
+        {
+          "description": "Data Analytics",
+          "price": 130.0,
+          "quantity": 12
+        }
+      ],
+      "notes": "",
+      "signature": "Chris",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_022",
+      "created_at": "2026-02-27T09:40:00Z",
+      "currency": "CAD",
+      "discount": 80.0,
+      "due_date": "2026-03-29",
+      "id": "inv_0022",
+      "invoice_number": "INV-2026-0022",
+      "issue_date": "2026-02-27",
+      "items": [
+        {
+          "description": "DevOps Support",
+          "price": 95.0,
+          "quantity": 18
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Pending",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_023",
+      "created_at": "2026-03-01T12:00:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-03-31",
+      "id": "inv_0023",
+      "invoice_number": "INV-2026-0023",
+      "issue_date": "2026-03-01",
+      "items": [
+        {
+          "description": "Photography",
+          "price": 950.0,
+          "quantity": 1
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Draft",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_024",
+      "created_at": "2026-03-03T09:10:00Z",
+      "currency": "CAD",
+      "discount": 60.0,
+      "due_date": "2026-04-02",
+      "id": "inv_0024",
+      "invoice_number": "INV-2026-0024",
+      "issue_date": "2026-03-03",
+      "items": [
+        {
+          "description": "Copywriting",
+          "price": 30.0,
+          "quantity": 40
+        }
+      ],
+      "notes": "",
+      "signature": "Emma",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_025",
+      "created_at": "2026-03-05T08:50:00Z",
+      "currency": "CAD",
+      "discount": 300.0,
+      "due_date": "2026-04-04",
+      "id": "inv_0025",
+      "invoice_number": "INV-2026-0025",
+      "issue_date": "2026-03-05",
+      "items": [
+        {
+          "description": "Brand Strategy",
+          "price": 4200.0,
+          "quantity": 1
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Overdue",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_026",
+      "created_at": "2026-03-07T11:15:00Z",
+      "currency": "CAD",
+      "discount": 0.0,
+      "due_date": "2026-04-06",
+      "id": "inv_0026",
+      "invoice_number": "INV-2026-0026",
+      "issue_date": "2026-03-07",
+      "items": [
+        {
+          "description": "Network Monitoring",
+          "price": 250.0,
+          "quantity": 6
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Pending",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_027",
+      "created_at": "2026-03-10T10:00:00Z",
+      "currency": "CAD",
+      "discount": 75.0,
+      "due_date": "2026-04-09",
+      "id": "inv_0027",
+      "invoice_number": "INV-2026-0027",
+      "issue_date": "2026-03-10",
+      "items": [
+        {
+          "description": "CRM Integration",
+          "price": 1400.0,
+          "quantity": 2
+        }
+      ],
+      "notes": "",
+      "signature": "Daniel",
+      "status": "Paid",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_028",
+      "created_at": "2026-03-12T14:00:00Z",
+      "currency": "CAD",
+      "discount": 250.0,
+      "due_date": "2026-04-11",
+      "id": "inv_0028",
+      "invoice_number": "INV-2026-0028",
+      "issue_date": "2026-03-12",
+      "items": [
+        {
+          "description": "UI Development",
+          "price": 55.0,
+          "quantity": 60
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Draft",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_029",
+      "created_at": "2026-03-15T13:10:00Z",
+      "currency": "CAD",
+      "discount": 90.0,
+      "due_date": "2026-04-14",
+      "id": "inv_0029",
+      "invoice_number": "INV-2026-0029",
+      "issue_date": "2026-03-15",
+      "items": [
+        {
+          "description": "QA Testing",
+          "price": 45.0,
+          "quantity": 40
+        }
+      ],
+      "notes": "",
+      "signature": null,
+      "status": "Pending",
+      "tax_rate": 0.13
+    },
+    {
+      "client_id": "client_030",
+      "created_at": "2026-03-18T09:30:00Z",
+      "currency": "CAD",
+      "discount": 500.0,
+      "due_date": "2026-04-17",
+      "id": "inv_0030",
+      "invoice_number": "INV-2026-0030",
+      "issue_date": "2026-03-18",
+      "items": [
+        {
+          "description": "Annual Support Contract",
+          "price": 5000.0,
+          "quantity": 1
+        }
+      ],
+      "notes": "Thank you for your continued business.",
+      "signature": "Sophia",
+      "status": "Paid",
+      "tax_rate": 0.13
+    }
+  ],
+  "referral_data": {
+    "active_referrals": 8,
+    "payout": 120.0,
+    "referral_code": "ACME125FT",
+    "total_earnings": 120.0,
+    "total_referrals": 12
+  }
+}

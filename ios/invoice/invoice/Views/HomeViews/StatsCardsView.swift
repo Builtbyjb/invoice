@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StatsCardsView: View {
-    let stats: DashboardStats
+    let dStats: Dashboard = fetchDashboard()
     let isLoading: Bool
 
     private let columns = [
@@ -20,7 +20,7 @@ struct StatsCardsView: View {
         LazyVGrid(columns: columns, spacing: 16) {
             StatCard(
                 title: "Total Revenue",
-                value: formatCurrency(stats.totalRevenue, currency: stats.currency),
+                value: formatCurrency(dStats.dashboardStats.totalRevenue, currency: dStats.dashboardStats.currency),
                 icon: "dollarsign.circle.fill",
                 iconColor: .blue,
                 isLoading: isLoading
@@ -28,7 +28,7 @@ struct StatsCardsView: View {
 
             StatCard(
                 title: "Paid Invoices",
-                value: "\(stats.paidCount)",
+                value: "\(dStats.dashboardStats.paidCount)",
                 icon: "checkmark.circle.fill",
                 iconColor: .green,
                 isLoading: isLoading
@@ -36,7 +36,7 @@ struct StatsCardsView: View {
 
             StatCard(
                 title: "Pending Invoices",
-                value: "\(stats.pendingCount)",
+                value: "\(dStats.dashboardStats.pendingCount)",
                 icon: "clock.fill",
                 iconColor: .orange,
                 isLoading: isLoading
@@ -44,7 +44,7 @@ struct StatsCardsView: View {
 
             StatCard(
                 title: "Overdue Invoices",
-                value: "\(stats.overdueCount)",
+                value: "\(dStats.dashboardStats.overdueCount)",
                 icon: "exclamationmark.triangle.fill",
                 iconColor: .red,
                 isLoading: isLoading
@@ -60,8 +60,6 @@ struct StatsCardsView: View {
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
     }
 }
-
-// MARK: - Individual Stat Card
 
 struct StatCard: View {
     let title: String
@@ -106,10 +104,8 @@ struct StatCard: View {
 
 #Preview {
     VStack {
-        StatsCardsView(stats: DashboardStats.placeholder, isLoading: true)
-            .padding()
+        StatsCardsView(isLoading: true).padding()
 
-        StatsCardsView(stats: DashboardStats.placeholder, isLoading: false)
-            .padding()
+        StatsCardsView(isLoading: false).padding()
     }
 }

@@ -11,7 +11,7 @@ struct CreateInvoiceView: View {
     let mode: InvoiceFormRoute
     let clients: [Client]
     @Binding var invoices: [Invoice]
-    let onComplete: () -> Void
+    @Environment(Router.self) var router
     
     @State private var selectedClient: Client?
     @State private var status: InvoiceStatus = .draft
@@ -24,11 +24,10 @@ struct CreateInvoiceView: View {
     @State private var notes: String = ""
     @State private var isSaving: Bool = false
     
-    init(mode: InvoiceFormRoute, clients: [Client], invoices: Binding<[Invoice]>, onComplete: @escaping () -> Void) {
+    init(mode: InvoiceFormRoute, clients: [Client], invoices: Binding<[Invoice]>) {
         self.mode = mode
         self.clients = clients
         self._invoices = invoices
-        self.onComplete = onComplete
         
         switch mode {
         case .create(let client):
@@ -38,8 +37,8 @@ struct CreateInvoiceView: View {
         case .edit(let invoice):
             _selectedClient = State(initialValue: invoice.client)
             _status = State(initialValue: invoice.status)
-            _issueDate = State(initialValue: invoice.issueDate)
-            _dueDate = State(initialValue: invoice.dueDate)
+            _issueDate = State(initialValue: invoice.issueDateValue)
+            _dueDate = State(initialValue: invoice.dueDateValue)
             _lineItems = State(initialValue: invoice.lineItems)
             _discountPercent = State(initialValue: invoice.discountPercent)
             _taxPercent = State(initialValue: invoice.taxPercent)
@@ -88,7 +87,7 @@ struct CreateInvoiceView: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button {
-                    onComplete()
+                    router.pop()
                 } label: {
                     Image(systemName: "xmark")
                         .font(.system(size: 17, weight: .semibold))
@@ -110,7 +109,6 @@ struct CreateInvoiceView: View {
         }
     }
     
-    // MARK: - Info Section
     
     private var infoSection: some View {
         Section("Invoice Information") {
@@ -142,7 +140,6 @@ struct CreateInvoiceView: View {
         }
     }
     
-    // MARK: - Line Items Section
     
     private var lineItemsSection: some View {
         Section {
@@ -207,7 +204,6 @@ struct CreateInvoiceView: View {
         }
     }
     
-    // MARK: - Summary Section
     
     private var summarySection: some View {
         Section {
@@ -259,8 +255,6 @@ struct CreateInvoiceView: View {
         }
     }
     
-    // MARK: - Signature Section
-    
     private var signatureSection: some View {
         Section("Signature") {
             SignatureCanvas(strokes: $signatureStrokes, readOnly: false, canvasHeight: 140)
@@ -279,16 +273,12 @@ struct CreateInvoiceView: View {
         }
     }
     
-    // MARK: - Notes Section
-    
     private var notesSection: some View {
         Section("Notes") {
             TextEditor(text: $notes)
                 .frame(minHeight: 80)
         }
     }
-    
-    // MARK: - Save
     
     private func save() {
         guard let client = selectedClient else { return }
@@ -313,8 +303,8 @@ struct CreateInvoiceView: View {
                 if let index = invoices.firstIndex(where: { $0.id == existing.id }) {
                     invoices[index].client = client
                     invoices[index].status = status
-                    invoices[index].issueDate = issueDate
-                    invoices[index].dueDate = dueDate
+                    invoices[index].issueDateValue = issueDate
+                    invoices[index].dueDateValue = dueDate
                     invoices[index].lineItems = lineItems
                     invoices[index].discountPercent = discountPercent
                     invoices[index].taxPercent = taxPercent
@@ -323,7 +313,7 @@ struct CreateInvoiceView: View {
                 }
             }
             isSaving = false
-            onComplete()
+            router.pop()
         }
     }
 }
@@ -331,9 +321,9 @@ struct CreateInvoiceView: View {
 #Preview {
     NavigationStack {
         CreateInvoiceView(
-            mode: .create(MockData.clients[0]),
-            clients: MockData.clients,
-            invoices: .constant(MockData.invoices)
-        ) {}
+            mode: .create(fetchClients()[0]),
+            clients: fetchClients(),
+            invoices: .constant(fetchInvoices())
+        )
     }
 }

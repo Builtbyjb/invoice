@@ -13,9 +13,6 @@ enum Route: Hashable {
     case help
     case settings
     case notification
-    case createClient
-//    case createInvoice
-//    case clientView
 }
 
 @Observable
@@ -45,9 +42,16 @@ class Router {
         case .help: HelpView()
         case .settings: SettingView()
         case .notification: NotificationView()
-        case .createClient: CreateClientView(mode: .create, clients: .constant([]))
-//        case .createInvoice: CreateInvoiceView()
-//        case .clientView: ClientView(client: .constant(.mock))
         }
+    }
+    
+    @ViewBuilder
+    func switchToClientView(client: Client, clients: Binding<[Client]>) -> some View {
+        ClientView(client: client, clients: clients)
+    }
+    
+    @ViewBuilder
+    func switchToClientCreateView(mode: ClientFormRoute, clients: Binding<[Client]> ) -> some View {
+        CreateClientView(mode: mode, clients: clients)
     }
 }

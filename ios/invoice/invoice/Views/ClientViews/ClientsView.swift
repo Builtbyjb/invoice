@@ -14,10 +14,11 @@ enum ClientFormRoute: Hashable {
 
 struct ClientsView: View {
     @State var router = Router.shared
-    @State private var clients: [Client] = MockData.clients
-    @State private var invoices: [Invoice] = MockData.invoices
+    @State private var clients: [Client] = fetchClients()
+    @State private var invoices: [Invoice] = fetchInvoices()
     @State private var searchText: String = ""
     @State private var showSearchBar: Bool = false
+    @State private var showCreateClient: Bool = false
 
     var filteredClients: [Client] {
         if searchText.isEmpty { return clients }
@@ -54,15 +55,24 @@ struct ClientsView: View {
                 .padding(.vertical, 8)
             }
             .navigationTitle("Clients")
-            .navigationDestination(for: Route.self) { route in
+            .navigationDestination(for: Client.self) { client in
+                router.switchToClientView(client: client, clients: $clients)
+            }
+            .navigationDestination(for: Route.self) {route in
                 router.switchView(route: route)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
-                    Button(action: {
-                        router.navigate(to: .createClient)
-                    }) {
+                    Button {
+                        showCreateClient.toggle()
+                    } label: {
                         Image(systemName: "plus")
+                    }
+                    .sheet(isPresented: $showCreateClient) {
+                        NavigationStack {
+                            router.switchToClientCreateView(mode: .create, clients: $clients)
+                        }
+                        .presentationDragIndicator(.visible)
                     }
                     Button {
                         showSearchBar.toggle()
@@ -93,10 +103,10 @@ struct ClientsView: View {
 
             }.safeAreaInset(edge: .bottom) {
                 if showSearchBar {
-                    SearchBarView(showSearchBar: $showSearchBar, searchText: $searchText, placeholder: "Search clients")
+                    SearchBarView(showSearchBar: $showSearchBar, searchText: $searchText, placeholder: "Search")
                 }
             }
-        }
+        }.environment(router)
     }
 }
 

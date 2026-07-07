@@ -116,8 +116,8 @@ struct InvoicePDFGenerator {
         
         let metaItems: [(String, String)] = [
             ("Status", invoice.status.rawValue),
-            ("Issue Date", dateFormatter.string(from: invoice.issueDate)),
-            ("Due Date", dateFormatter.string(from: invoice.dueDate))
+            ("Issue Date", dateFormatter.string(from: invoice.issueDateValue)),
+            ("Due Date", dateFormatter.string(from: invoice.dueDateValue))
         ]
         
         var maxHeight: CGFloat = 0

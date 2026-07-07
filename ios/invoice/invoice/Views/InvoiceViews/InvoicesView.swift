@@ -13,9 +13,9 @@ enum InvoiceFormRoute: Hashable {
 }
 
 struct InvoicesView: View {
-    @State private var router = Router.shared
-    @State private var invoices: [Invoice] = MockData.invoices
-    @State private var clients: [Client] = MockData.clients
+    @Bindable var router = Router.shared
+    @State private var invoices: [Invoice] = fetchInvoices()
+    @State private var clients: [Client] = fetchClients()
     @State private var showClientPicker: Bool = false
     @State private var selectedClientForInvoice: Client? = nil
     @State private var searchText: String = ""
@@ -62,33 +62,20 @@ struct InvoicesView: View {
             .navigationDestination(for: Route.self) { route in
                 router.switchView(route: route)
             }
-            //            .navigationDestination(for: Invoice.self) { invoice in
-            //                //                InvoiceView(
-            //                //                    invoice: invoice,
-            //                //                    invoices: $invoices,
-            //                //                    clients: clients,
-            //                ////                    onNavigate: { router.navigate(to: .help) }
-            //                //                )
-            //            }
-            //            .navigationDestination(for: InvoiceFormRoute.self) { route in
-            //                CreateInvoiceView(
-            //                    mode: route,
-            //                    clients: clients,
-            //                    invoices: $invoices
-            //                ) {
-            //                    //                    path.removeLast()
-            //                }
-            //            }
-            //            .navigationDestination(for: ClientFormRoute.self) { route in
-            //                //                CreateClientView(mode: route, clients: $clients) {
-            //                //                    path.removeLast()
-            //                //                }
-            //            }
+            .navigationDestination(for: Invoice.self) { invoice in
+                InvoiceView(invoice: invoice, invoices: $invoices, clients: clients)
+            }
+            .navigationDestination(for: InvoiceFormRoute.self) { route in
+                CreateInvoiceView(mode: route, clients: clients, invoices: $invoices)
+            }
+            .navigationDestination(for: ClientFormRoute.self) { route in
+                CreateClientView(mode: route, clients: $clients)
+            }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Button {
                         if clients.isEmpty {
-                            //                            router.navigate(to: (ClientFormRoute.create)
+                            router.path.append(ClientFormRoute.create)
                         } else {
                             selectedClientForInvoice = clients.first
                             showClientPicker = true
@@ -128,7 +115,7 @@ struct InvoicesView: View {
                     SearchBarView(
                         showSearchBar: $showSearchBar,
                         searchText: $searchText,
-                        placeholder: "Search Invoices"
+                        placeholder: "Search"
                     )
                 }
             }
@@ -139,16 +126,16 @@ struct InvoicesView: View {
                     onContinue: {
                         showClientPicker = false
                         if let client = selectedClientForInvoice {
-                            //                            path.append(InvoiceFormRoute.create(client))
+                            router.path.append(InvoiceFormRoute.create(client))
                         }
                     },
                     onCreateClient: {
                         showClientPicker = false
-                        //                        path.append(ClientFormRoute.create)
+                        router.path.append(ClientFormRoute.create)
                     }
                 )
             }
-        }
+        }.environment(router)
     }
 }
 
@@ -157,18 +144,19 @@ struct InvoiceListCard: View {
 
     var body: some View {
         HStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(invoice.formattedInvoiceNumber)
-                    .font(.headline)
-
-                Text(invoice.client.name)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
 
-                HStack(spacing: 6) {
-                    StatusBadge(status: invoice.status)
+                //                Text(invoice.client.name)
+                //                    .font(.subheadline)
+                //                    .foregroundColor(.secondary)
 
-                    Text("Due \(invoice.dueDate, style: .date)")
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("\(invoice.grandTotal, format: .currency(code: "USD"))")
+                        .font(.headline)
+
+                    Text("Due \(invoice.dueDateValue, style: .date)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -177,13 +165,7 @@ struct InvoiceListCard: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text("\(invoice.grandTotal, format: .currency(code: "USD"))")
-                    .font(.headline)
-                Text(
-                    "\(invoice.lineItems.count) item\(invoice.lineItems.count == 1 ? "" : "s")"
-                )
-                .font(.caption)
-                .foregroundColor(.secondary)
+                StatusBadge(status: invoice.status)
             }
 
             Image(systemName: "chevron.right")
@@ -192,9 +174,9 @@ struct InvoiceListCard: View {
         }
         .padding()
         .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16)) // 2. Add border radius
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
-            RoundedRectangle(cornerRadius: 16) // 3. Match the shape for the border
+            RoundedRectangle(cornerRadius: 16)
                 .stroke(Color.black.opacity(0.05), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
