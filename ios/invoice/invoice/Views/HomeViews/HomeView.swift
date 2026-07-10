@@ -62,26 +62,37 @@ extension View {
 struct HomeView: View {
     @State private var router = Router.shared
     @State private var isLoading = true
-    @State private var dStats: Dashboard = fetchDashboard()
+    @State private var dStats: Dashboard = .init(
+        stats: .init(totalRevenue: 0, paidCount: 0, pendingCount: 0, overdueCount: 0, currency: "N/A"),
+        invoicesStatus: [],
+        monthlyRevenues: []
+    )
 
     var body: some View {
         NavigationStack(path: $router.path) {
             ScrollView {
                 VStack(spacing: 24) {
                     // Stats Cards Section
-                    StatsCardsView(isLoading: isLoading).padding(.horizontal)
+                    StatsCardsView(stats: dStats.stats ,isLoading: isLoading).padding(.horizontal)
 
                     // Revenue Chart Section
-                    RevenueChartView(isLoading: isLoading).padding(.horizontal)
+                    RevenueChartView(monthlyRevenue: dStats.monthlyRevenues, isLoading: isLoading).padding(.horizontal)
 
                     // Status Chart Section
-                    StatusChartView(isLoading: isLoading).padding(.horizontal)
+                    StatusChartView(statusCounts: dStats.invoicesStatus, isLoading: isLoading).padding(.horizontal)
                 }
                 .padding(.vertical)
             }
             .navigationTitle("Dashboard")
             .navigationDestination(for: Route.self) { route in
                 router.switchView(route: route)
+            }
+            .task {
+                do {
+                    dStats = try await Dashboard.fetchDashboardData()
+                } catch {
+                    print(error)
+                }
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {

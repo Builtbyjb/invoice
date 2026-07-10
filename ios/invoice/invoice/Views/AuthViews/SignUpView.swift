@@ -23,7 +23,7 @@ struct SignUpView: View {
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 16) {
                 
                 // View Title
                 Text("Create your account")
@@ -32,18 +32,18 @@ struct SignUpView: View {
                     .padding(.top, 20)
                 
                 // Form Fields
-                VStack(spacing: 16) {
+                VStack(spacing: 12) {
                     customTextField(title: "First Name", text: $firstName, placeholder: "John")
                     customTextField(title: "Last Name", text: $lastName, placeholder: "Doe")
                     customTextField(title: "Email Address", text: $email, placeholder: "name@example.com")
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
-                    customTextField(title: "Username", text: $username, placeholder: "johndoe123")
+                    customTextField(title: "What should we call you?", text: $username, placeholder: "johndoe123")
                         .autocapitalization(.none)
                     customTextField(title: "Business Name", text: $businessName, placeholder: "Acme Corp")
                     
                     // Country Dropdown (Picker)
-                    VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text("Country")
                             .font(.footnote.weight(.semibold))
                             .foregroundColor(.gray)
@@ -63,7 +63,7 @@ struct SignUpView: View {
                 
                 // Submit Button
                 Button {
-                    // Handle sign up action here
+                    print(email, username, firstName, lastName, businessName, selectedCountry)
                 } label: {
                     Text("Sign Up")
                         .font(.headline)
@@ -78,10 +78,8 @@ struct SignUpView: View {
                 Button("Already have an account? Sign In") {
                     // Remove last item on the navigation stack which is the LogInView
                     router.pop()
-
                     router.navigate(to: .logIn)
                 }
-                
             }
             .padding(.horizontal, 24)
         }
@@ -90,7 +88,7 @@ struct SignUpView: View {
     // Helper view building component for input fields
     @ViewBuilder
     private func customTextField(title: String, text: Binding<String>, placeholder: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.footnote.weight(.semibold))
                 .foregroundColor(.gray)

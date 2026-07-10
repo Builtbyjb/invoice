@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct StatsCardsView: View {
-    let dStats: Dashboard = fetchDashboard()
+    let stats: DashboardStats
     let isLoading: Bool
 
     private let columns = [
         GridItem(.flexible()),
-        GridItem(.flexible())
+        GridItem(.flexible()),
     ]
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: 16) {
             StatCard(
                 title: "Total Revenue",
-                value: formatCurrency(dStats.dashboardStats.totalRevenue, currency: dStats.dashboardStats.currency),
+                value: formatCurrency(stats.totalRevenue, currency: stats.currency),
                 icon: "dollarsign.circle.fill",
                 iconColor: .blue,
                 isLoading: isLoading
@@ -28,7 +28,7 @@ struct StatsCardsView: View {
 
             StatCard(
                 title: "Paid Invoices",
-                value: "\(dStats.dashboardStats.paidCount)",
+                value: "\(stats.paidCount)",
                 icon: "checkmark.circle.fill",
                 iconColor: .green,
                 isLoading: isLoading
@@ -36,7 +36,7 @@ struct StatsCardsView: View {
 
             StatCard(
                 title: "Pending Invoices",
-                value: "\(dStats.dashboardStats.pendingCount)",
+                value: "\(stats.pendingCount)",
                 icon: "clock.fill",
                 iconColor: .orange,
                 isLoading: isLoading
@@ -44,7 +44,7 @@ struct StatsCardsView: View {
 
             StatCard(
                 title: "Overdue Invoices",
-                value: "\(dStats.dashboardStats.overdueCount)",
+                value: "\(stats.overdueCount)",
                 icon: "exclamationmark.triangle.fill",
                 iconColor: .red,
                 isLoading: isLoading
@@ -104,8 +104,14 @@ struct StatCard: View {
 
 #Preview {
     VStack {
-        StatsCardsView(isLoading: true).padding()
+        StatsCardsView(
+            stats: DashboardStats(totalRevenue: 0, paidCount: 0, pendingCount: 0, overdueCount: 0, currency: "N/A"),
+            isLoading: true
+        ).padding()
 
-        StatsCardsView(isLoading: false).padding()
+        StatsCardsView(
+            stats: DashboardStats(totalRevenue: 0, paidCount: 0, pendingCount: 0, overdueCount: 0, currency: "N/A"),
+            isLoading: false
+        ).padding()
     }
 }

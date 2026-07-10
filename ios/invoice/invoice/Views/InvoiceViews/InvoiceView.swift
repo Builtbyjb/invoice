@@ -37,7 +37,7 @@ struct InvoiceView: View {
             }
             .padding()
         }
-        .navigationTitle(invoice.formattedInvoiceNumber)
+        .navigationTitle(invoice.invoiceNumber)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -99,17 +99,17 @@ struct InvoiceView: View {
                     Circle()
                         .fill(Color.blue.opacity(0.15))
                         .frame(width: 40, height: 40)
-                    Text(String(invoice.client.name.prefix(1)))
+                    Text(String(invoice.clientName.prefix(1)))
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.blue)
                 }
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(invoice.client.name)
+                    Text(invoice.clientName)
                         .font(.headline)
-                    Text(invoice.client.email)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+//                    Text(invoice.client.email)
+//                        .font(.subheadline)
+//                        .foregroundColor(.secondary)
                 }
             }
         }
@@ -124,9 +124,9 @@ struct InvoiceView: View {
         HStack(spacing: 0) {
             MetaItem(label: "Status", value: invoice.status.rawValue, valueColor: statusColor)
             Divider()
-            MetaItem(label: "Issue Date", value: invoice.issueDateValue.formatted(date: .abbreviated, time: .omitted))
+            MetaItem(label: "Issue Date", value: invoice.issueDate.formatted(date: .abbreviated, time: .omitted))
             Divider()
-            MetaItem(label: "Due Date", value: invoice.dueDateValue.formatted(date: .abbreviated, time: .omitted))
+            MetaItem(label: "Due Date", value: invoice.dueDate.formatted(date: .abbreviated, time: .omitted))
         }
         .padding()
         .background(Color(.systemBackground))
@@ -178,7 +178,7 @@ struct InvoiceView: View {
                         Text(item.description)
                             .font(.subheadline)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("\(item.quantity, specifier: "%.1f") \(item.unit)")
+                        Text("\(item.quantity, specifier: "%.1f") \(item.unit ?? "")")
                             .font(.caption)
                             .frame(width: 50, alignment: .center)
                         Text(item.price, format: .currency(code: "USD"))
@@ -269,7 +269,7 @@ struct InvoiceView: View {
         guard let data = InvoicePDFGenerator.generatePDF(for: invoice) else { return }
         
         let tempDir = FileManager.default.temporaryDirectory
-        let url = tempDir.appendingPathComponent("\(invoice.formattedInvoiceNumber).pdf")
+        let url = tempDir.appendingPathComponent("\(invoice.clientName)-\(invoice.invoiceNumber).pdf")
         
         do {
             try data.write(to: url)
@@ -367,9 +367,32 @@ struct ShareSheet: UIViewControllerRepresentable {
 #Preview {
     NavigationStack {
         InvoiceView(
-            invoice: fetchInvoices()[0],
-            invoices: .constant(fetchInvoices()),
-            clients: fetchClients(),
+            invoice: Invoice(
+                id: "1",
+                invoiceNumber: "INV-001",
+                clientId: "c1",
+                clientName: "Acme Corp",
+                items: [
+                    InvoiceItem(
+                        id: UUID(),
+                        description: "Widget",
+                        quantity: 2,
+                        unit: "ea",
+                        price: 49.99
+                    )
+                ],
+                taxRate: 10,
+                discount: 5,
+                status: .pending,
+                signature: nil,
+                issueDate: Date(),
+                dueDate: Date(),
+                currency: "USD",
+                notes: "Net 14",
+                createdAt: Date()
+            ),
+            invoices: .constant([]),
+            clients: []
         )
     }.environment(Router.shared)
 }

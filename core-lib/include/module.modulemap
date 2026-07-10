@@ -1,4 +1,0 @@
-module core_libFFI {
-    umbrella header "core_libFFI.h"
-    export *
-}

@@ -8,15 +8,12 @@
 import SwiftUI
 
 struct ClientView: View {
+    @Environment(Router.self) var router
     let client: Client
     @Binding var clients: [Client]
 
-    @Environment(Router.self) var router
     @State private var showEditClient: Bool = false
-
-    private var clientInvoices: [Invoice] {
-        fetchInvoices().filter { $0.clientId == client.id }
-    }
+    @State private var clientInvoices: [Invoice] = []
 
     var body: some View {
         ScrollView {
@@ -68,6 +65,13 @@ struct ClientView: View {
             .cornerRadius(16)
             .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
         }
+        .task {
+            do {
+                clientInvoices = try await Invoice.fetchClientInvoices()
+            } catch {
+                print(error)
+            }
+        }
         .padding()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -118,8 +122,30 @@ struct InfoRow: View {
 #Preview {
     NavigationStack {
         ClientView(
-            client: fetchClients()[0],
-            clients: .constant(fetchClients()),
+            client: Client(
+                id: "1",
+                organizationId: 1,
+                name: "Client",
+                email: "client@example.com",
+                phone: "+1 234 567 8900",
+                address: "",
+                city: "Toronto",
+                country: "Canada",
+                createdAt: "now"
+            ),
+            clients: .constant([
+                Client(
+                    id: "3",
+                    organizationId: 2,
+                    name: "Client2",
+                    email: "client2@example.com",
+                    phone: "+1 234 567 8900",
+                    address: "",
+                    city: "Toronto",
+                    country: "Canada",
+                    createdAt: "now"
+                )
+            ])
         )
     }.environment(Router.shared)
 }

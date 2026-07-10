@@ -5,20 +5,19 @@
 //  Created by Ajibola Awotide on 2026-06-27.
 //
 
-import SwiftUI
 import Charts
+import SwiftUI
 
 struct StatusChartView: View {
-    let statusCounts = fetchDashboard().invoicesStatus
+    let statusCounts: [InvoiceStatusCount]
     let isLoading: Bool
 
-    private func statusColor(_ status: String) -> Color {
+    private func statusColor(_ status: InvoiceStatus) -> Color {
         switch status {
-        case "Paid": return .green
-        case "Sent": return .blue
-        case "Draft": return .gray
-        case "Overdue": return .red
-        default: return .orange
+        case .paid: return .green
+        case .pending: return .blue
+        case .draft: return .gray
+        case .overdue: return .red
         }
     }
 
@@ -95,7 +94,7 @@ struct StatusChartView: View {
                                     .fill(statusColor(item.status))
                                     .frame(width: 10, height: 10)
 
-                                Text(item.status)
+                                Text("\(item.status.rawValue)")
                                     .font(.subheadline)
 
                                 Spacer()
@@ -118,5 +117,5 @@ struct StatusChartView: View {
 }
 
 #Preview {
-    StatusChartView(isLoading: false).padding()
+    StatusChartView(statusCounts: [] ,isLoading: false).padding()
 }

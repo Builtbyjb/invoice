@@ -14,8 +14,8 @@ enum InvoiceFormRoute: Hashable {
 
 struct InvoicesView: View {
     @Bindable var router = Router.shared
-    @State private var invoices: [Invoice] = fetchInvoices()
-    @State private var clients: [Client] = fetchClients()
+    @State private var invoices: [Invoice] = []
+    @State private var clients: [Client] = []
     @State private var showClientPicker: Bool = false
     @State private var selectedClientForInvoice: Client? = nil
     @State private var searchText: String = ""
@@ -24,12 +24,9 @@ struct InvoicesView: View {
     var filteredInvoices: [Invoice] {
         if searchText.isEmpty { return invoices }
         return invoices.filter {
-            $0.formattedInvoiceNumber.localizedCaseInsensitiveContains(
-                searchText
-            ) || $0.client.name.localizedCaseInsensitiveContains(searchText)
-                || $0.status.rawValue.localizedCaseInsensitiveContains(
-                    searchText
-                )
+            $0.invoiceNumber.localizedCaseInsensitiveContains(searchText)
+                || $0.clientName.localizedCaseInsensitiveContains(searchText)
+                || $0.status.rawValue.localizedCaseInsensitiveContains(searchText)
         }
     }
 
@@ -70,6 +67,13 @@ struct InvoicesView: View {
             }
             .navigationDestination(for: ClientFormRoute.self) { route in
                 CreateClientView(mode: route, clients: $clients)
+            }
+            .task {
+                do {
+                    invoices = try await Invoice.fetchInvoices()
+                } catch {
+                    print(error)
+                }
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
@@ -145,18 +149,18 @@ struct InvoiceListCard: View {
     var body: some View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
-                Text(invoice.formattedInvoiceNumber)
+                Text(invoice.invoiceNumber)
                     .font(.subheadline)
 
-                //                Text(invoice.client.name)
-                //                    .font(.subheadline)
-                //                    .foregroundColor(.secondary)
+                Text(invoice.clientName)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("\(invoice.grandTotal, format: .currency(code: "USD"))")
                         .font(.headline)
 
-                    Text("Due \(invoice.dueDateValue, style: .date)")
+                    Text("Due \(invoice.dueDate, style: .date)")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct RevenueChartView: View {
-    let monthlyRevenue = fetchDashboard().monthlyRevenue
+    let monthlyRevenue: [MonthlyRevenue]
     let isLoading: Bool
 
     @State private var selectedYear = "Lifetime"
@@ -196,5 +196,5 @@ struct MonthlyRevenueAggregate: Identifiable {
 }
 
 #Preview {
-    RevenueChartView(isLoading: false).padding()
+    RevenueChartView(monthlyRevenue: [], isLoading: false).padding()
 }

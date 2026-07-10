@@ -14,8 +14,8 @@ enum ClientFormRoute: Hashable {
 
 struct ClientsView: View {
     @State var router = Router.shared
-    @State private var clients: [Client] = fetchClients()
-    @State private var invoices: [Invoice] = fetchInvoices()
+    @State private var clients: [Client] = []
+//    @State private var invoices: [Invoice] = []
     @State private var searchText: String = ""
     @State private var showSearchBar: Bool = false
     @State private var showCreateClient: Bool = false
@@ -58,8 +58,15 @@ struct ClientsView: View {
             .navigationDestination(for: Client.self) { client in
                 router.switchToClientView(client: client, clients: $clients)
             }
-            .navigationDestination(for: Route.self) {route in
+            .navigationDestination(for: Route.self) { route in
                 router.switchView(route: route)
+            }
+            .task {
+                do {
+                    clients = try await Client.fetchClients()
+                } catch {
+                    print(error)
+                }
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {

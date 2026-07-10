@@ -6,11 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		5911489D2FF40D3600E5F6AD /* core_lib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5911489C2FF40D3600E5F6AD /* core_lib.xcframework */; };
-		5911489E2FF40D3600E5F6AD /* core_lib.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5911489C2FF40D3600E5F6AD /* core_lib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		59BAF25C2FEC0DC300375D7E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -35,7 +30,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				5911489E2FF40D3600E5F6AD /* core_lib.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -43,7 +37,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5911489C2FF40D3600E5F6AD /* core_lib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = core_lib.xcframework; sourceTree = "<group>"; };
 		597353052FEC25B100397C1F /* invoice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = invoice.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		597353062FEC25B100397C1F /* invoiceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = invoiceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		597353072FEC25B100397C1F /* invoiceUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = invoiceUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -72,7 +65,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5911489D2FF40D3600E5F6AD /* core_lib.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,7 +88,6 @@
 		5934A6D22FEC5BBA002795BD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5911489C2FF40D3600E5F6AD /* core_lib.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
