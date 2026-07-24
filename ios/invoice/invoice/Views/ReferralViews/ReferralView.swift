@@ -254,4 +254,5 @@ struct ReferralView: View {
 
 #Preview {
     ReferralView(router: AppRouter())
+        .withPreviewEnvironment()
 }

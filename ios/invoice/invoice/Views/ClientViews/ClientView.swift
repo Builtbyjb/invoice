@@ -47,18 +47,18 @@ struct ClientView: View {
 
                 Spacer()
 
-                Button {
-                    // Handle Invoices viewing action here
-                } label: {
-                    Text("View Invoices")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(.vertical, 10)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .cornerRadius(8)
-                }
-                .padding(.top, 10)
+//                Button {
+//                    // Handle Invoices viewing action here
+//                } label: {
+//                    Text("View Invoices")
+//                        .font(.headline)
+//                        .foregroundColor(.white)
+//                        .padding(.vertical, 10)
+//                        .frame(maxWidth: .infinity)
+//                        .background(Color.blue)
+//                        .cornerRadius(8)
+//                }
+//                .padding(.top, 10)
             }
             .padding()
             .background(Color(.systemBackground))
@@ -75,12 +75,21 @@ struct ClientView: View {
         .padding()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    if clients.first(where: { $0.id == client.id }) != nil {
-                        showEditClient.toggle()
+                ControlGroup {
+                    Button {
+                        if clients.first(where: { $0.id == client.id }) != nil {
+                            showEditClient.toggle()
+                        }
+                    } label: {
+                        Image(systemName: "square.and.pencil")
                     }
-                } label: {
-                    Image(systemName: "square.and.pencil")
+
+                    Button {
+                        // Handle view all clients invoices
+                        print("View invoices")
+                    } label: {
+                        Image(systemName: "document.badge.ellipsis")
+                    }
                 }
             }
         }

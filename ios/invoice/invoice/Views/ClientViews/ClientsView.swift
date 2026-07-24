@@ -102,4 +102,5 @@ struct ClientsView: View {
 
 #Preview {
     ClientsView(router: AppRouter())
+        .withPreviewEnvironment()
 }

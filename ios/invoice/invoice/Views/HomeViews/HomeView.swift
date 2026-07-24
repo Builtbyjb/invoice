@@ -55,4 +55,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .withPreviewEnvironment()
 }

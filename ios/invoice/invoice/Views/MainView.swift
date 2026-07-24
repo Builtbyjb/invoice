@@ -22,5 +22,6 @@ struct MainView: View {
 }
 
 #Preview {
-    MainView().environment(AuthSession.shared)
+    MainView()
+        .withPreviewEnvironment()
 }

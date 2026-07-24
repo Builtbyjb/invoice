@@ -230,4 +230,5 @@ struct ClientPickerSheet: View {
 
 #Preview {
     InvoicesView(router: AppRouter())
+        .withPreviewEnvironment()
 }
