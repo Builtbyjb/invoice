@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct AcorpInvoiceApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     var body: some Scene {
         WindowGroup {
             MainView()
+                .environment(AuthSession.shared)
+                .environment(NotificationStore.shared)
+                .environment(PushNotificationManager.shared)
         }
     }
 }

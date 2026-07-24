@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-enum InvoiceFormRoute: Hashable {
-    case create(Client?)
-    case edit(Invoice)
-}
-
 struct InvoicesView: View {
-    @Bindable var router = Router.shared
+    @State private var router: AppRouter
+    
+    init(router: AppRouter) {
+        _router = State(initialValue: router)
+    }
+    
     @State private var invoices: [Invoice] = []
     @State private var clients: [Client] = []
     @State private var showClientPicker: Bool = false
@@ -56,7 +56,7 @@ struct InvoicesView: View {
                 .padding(.vertical, 8)
             }
             .navigationTitle("Invoices")
-            .navigationDestination(for: Route.self) { route in
+            .navigationDestination(for: AppRoute.self) { route in
                 router.switchView(route: route)
             }
             .navigationDestination(for: Invoice.self) { invoice in
@@ -94,24 +94,7 @@ struct InvoicesView: View {
                     }
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    ControlGroup {
-                        Button(action: {
-                            router.navigate(to: .help)
-                        }) {
-                            Image(systemName: "questionmark.circle")
-                        }
-                        Button(action: {
-                            router.navigate(to: .notification)
-                        }) {
-                            Image(systemName: "bell")
-                        }
-                        Button(action: {
-                            router.navigate(to: .settings)
-
-                        }) {
-                            Image(systemName: "gear")
-                        }
-                    }
+                    TopBarButtons()
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -246,5 +229,5 @@ struct ClientPickerSheet: View {
 }
 
 #Preview {
-    InvoicesView()
+    InvoicesView(router: AppRouter())
 }

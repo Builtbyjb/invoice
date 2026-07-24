@@ -7,36 +7,45 @@
 import Foundation
 
 struct DashboardStats: Codable, Equatable, Hashable {
-    public var totalRevenue: Double
     public var paidCount: UInt64
-    public var pendingCount: UInt64
+    public var sentCount: UInt64
     public var overdueCount: UInt64
-    public var currency: String
+    public var draftCount: UInt64
 }
 
-struct InvoiceStatusCount: Equatable, Hashable, Identifiable {
-    public var id: UUID = UUID()
+struct InvoiceStatusCount: Codable, Equatable, Hashable {
     public var status: InvoiceStatus
     public var count: UInt64
 }
 
-struct MonthlyRevenue: Equatable, Hashable {
+struct MonthlyRevenue: Codable, Equatable, Hashable {
     public var month: String
-    public var year: UInt16
-    public var currency: String
-    public var amount: UInt32
+    public var amount: Double
 }
 
-struct Dashboard {
+struct Dashboard: Codable, Equatable, Hashable {
     public var stats: DashboardStats
-    public var invoicesStatus: [InvoiceStatusCount]
     public var monthlyRevenues: [MonthlyRevenue]
 
-    static func fetchDashboardData() async throws -> Dashboard {
-        return Dashboard(
-            stats: .init(totalRevenue: 0, paidCount: 0, pendingCount: 0, overdueCount: 0, currency: "N/A"),
-            invoicesStatus: [],
-            monthlyRevenues: []
+    static func fetchDashboardStats() async throws -> DashboardStats {
+        return try await APIClient.shared.request(
+            path: "/api/v1/user/dashboard/stats",
+            method: "GET",
+            requiresAuth: true
+        )
+    }
+    
+    static func fetchMonthlyRevenue(year: String?, currency: String) async throws -> [MonthlyRevenue] {
+        var queryItems: [URLQueryItem] = [
+            URLQueryItem(name: "currency", value: currency)
+        ]
+        if let year = year, !year.isEmpty {
+            queryItems.append(URLQueryItem(name: "year", value: year))
+        }
+        return try await APIClient.shared.request(
+            path: "/api/v1/user/dashboard/revenues?year=2026&currency=usd",
+            method: "GET",
+            requiresAuth: true
         )
     }
 }

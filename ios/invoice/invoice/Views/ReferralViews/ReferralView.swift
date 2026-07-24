@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct ReferralView: View {
-    @State private var router = Router.shared
+    @State private var router: AppRouter
+    
+    init(router: AppRouter) {
+        _router = State(initialValue: router)
+    }
+    
     @State private var copied = false
-
-    private let referralCode = "INVOICE123"
+    @State private var referral: Referral? = nil
+    @State private var isLoading = true
 
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -21,24 +26,21 @@ struct ReferralView: View {
                     VStack(spacing: 16) {
                         StatCard(
                             title: "Total Referrals",
-                            value: "12",
+                            value: formattedUInt(referral?.totalReferrals),
                             icon: "person.2.fill",
-                            iconColor: .blue,
-                            isLoading: false
+                            iconColor: .blue
                         )
                         StatCard(
                             title: "Active Referrals",
-                            value: "8",
+                            value: formattedUInt(referral?.activeReferrals),
                             icon: "person.fill.checkmark",
-                            iconColor: .green,
-                            isLoading: false
+                            iconColor: .green
                         )
                         StatCard(
                             title: "Total Earnings",
-                            value: "$120.00",
+                            value: formattedCurrency(referral?.totalEarnings),
                             icon: "dollarsign.circle.fill",
-                            iconColor: .orange,
-                            isLoading: false
+                            iconColor: .orange
                         )
                         payoutCard
                     }
@@ -52,33 +54,33 @@ struct ReferralView: View {
                 .padding()
             }
             .navigationTitle("Referral")
-            .navigationDestination(for: Route.self) { route in
+            .navigationDestination(for: AppRoute.self) { route in
                 router.switchView(route: route)
             }
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    ControlGroup {
-                        Button(action: {
-                            router.navigate(to: .help)
-                        }) {
-                            Image(systemName: "questionmark.circle")
-                        }
-                        Button(action: {
-                            router.navigate(to: .notification)
-                        }) {
-                            Image(systemName: "bell")
-                        }
-                        Button(action: {
-                            router.navigate(to: .settings)
-
-                        }) {
-                            Image(systemName: "gear")
-                        }
-                    }
+                    TopBarButtons()
                 }
             }
+            .task {
+                do {
+                    referral = try await Referral.fetchReferralData()
+                } catch {
+                    print("Failed to load referral data: \(error)")
+                }
+                isLoading = false
+            }
+        }.environment(router)
+    }
 
-        }
+    private func formattedUInt(_ value: UInt64?) -> String {
+        guard let value else { return "0" }
+        return String(value)
+    }
+
+    private func formattedCurrency(_ value: Double?) -> String {
+        guard let value else { return "$0.00" }
+        return String(format: "%.2f", value)
     }
 
     // MARK: - Payout Card
@@ -106,6 +108,12 @@ struct ReferralView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
+            }
+
+            if !isLoading, let referral {
+                Text(formattedCurrency(referral.payout))
+                    .font(.title3)
+                    .fontWeight(.semibold)
             }
 
             VStack(spacing: 8) {
@@ -146,7 +154,7 @@ struct ReferralView: View {
                 .fontWeight(.semibold)
 
             HStack {
-                Text(referralCode)
+                Text(referral?.referralCode ?? "—")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundStyle(.primary)
 
@@ -165,6 +173,7 @@ struct ReferralView: View {
                     .background(Color.blue.opacity(0.15))
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
+                .disabled(referral == nil)
             }
 
             Text(
@@ -234,7 +243,8 @@ struct ReferralView: View {
     }
 
     private func copyToClipboard() {
-        UIPasteboard.general.string = referralCode
+        guard let code = referral?.referralCode else { return }
+        UIPasteboard.general.string = code
         copied = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             copied = false
@@ -243,5 +253,5 @@ struct ReferralView: View {
 }
 
 #Preview {
-    ReferralView()
+    ReferralView(router: AppRouter())
 }

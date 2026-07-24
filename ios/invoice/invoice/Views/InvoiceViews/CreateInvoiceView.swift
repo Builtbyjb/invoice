@@ -11,13 +11,13 @@ struct CreateInvoiceView: View {
     let mode: InvoiceFormRoute
     let clients: [Client]
     @Binding var invoices: [Invoice]
-    @Environment(Router.self) var router
+    @Environment(AppRouter.self) var router
 
     @State private var selectedClient: Client?
     @State private var status: InvoiceStatus = .draft
     @State private var issueDate: Date = Date()
     @State private var dueDate: Date = Date().addingTimeInterval(7 * 24 * 60 * 60)
-    @State private var lineItems: [InvoiceItem] = []
+    @State private var items: [InvoiceItem] = []
     @State private var discountPercent: Double = 0
     @State private var taxPercent: Double = 0
     @State private var signatureStrokes: [Stroke] = []
@@ -39,7 +39,7 @@ struct CreateInvoiceView: View {
             _status = State(initialValue: invoice.status)
             _issueDate = State(initialValue: invoice.issueDate)
             _dueDate = State(initialValue: invoice.dueDate)
-            _lineItems = State(initialValue: invoice.lineItems)
+            _items = State(initialValue: invoice.items)
             _discountPercent = State(initialValue: invoice.discountPercent)
             _taxPercent = State(initialValue: invoice.taxPercent)
             _signatureStrokes = State(initialValue: invoice.signatureStrokes)
@@ -48,7 +48,7 @@ struct CreateInvoiceView: View {
     }
 
     var subtotal: Double {
-        lineItems.reduce(0) { $0 + $1.total }
+        items.reduce(0) { $0 + $1.total }
     }
 
     var discountAmount: Double {
@@ -64,7 +64,7 @@ struct CreateInvoiceView: View {
     }
 
     var isFormValid: Bool {
-        selectedClient != nil && !lineItems.isEmpty
+        selectedClient != nil && !items.isEmpty
     }
 
     var title: String {
@@ -141,7 +141,7 @@ struct CreateInvoiceView: View {
 
     private var lineItemsSection: some View {
         Section {
-            ForEach($lineItems) { $item in
+            ForEach($items, id: \.self) { $item in
                 VStack(alignment: .leading, spacing: 8) {
                     TextField("Description", text: $item.description)
 
@@ -192,11 +192,11 @@ struct CreateInvoiceView: View {
                 .padding(.vertical, 4)
             }
             .onDelete { indexSet in
-                lineItems.remove(atOffsets: indexSet)
+                items.remove(atOffsets: indexSet)
             }
 
             Button {
-                lineItems.append(InvoiceItem(id: UUID(), description: "", quantity: 1, unit: "ea", price: 0))
+                items.append(InvoiceItem(description: "", quantity: 1, unit: "ea", price: 0))
             } label: {
                 HStack {
                     Image(systemName: "plus.circle")
@@ -287,47 +287,66 @@ struct CreateInvoiceView: View {
         guard let client = selectedClient else { return }
         isSaving = true
 
-        DispatchQueue.main.asyncAfter(
-            deadline: .now() + 0.5,
-            execute: DispatchWorkItem {
+        Task {
+            do {
+                let signature: String? = {
+                    guard !signatureStrokes.isEmpty else { return nil }
+                    do {
+                        let data = try JSONEncoder().encode(signatureStrokes)
+                        return String(data: data, encoding: .utf8)
+                    } catch {
+                        return nil
+                    }
+                }()
+
                 switch mode {
                 case .create:
-                    var newInvoice = Invoice(
-                        id: UUID().uuidString,
-                        invoiceNumber: "",
+                    let newInvoice = try await Invoice.create(
                         clientId: client.id,
-                        clientName: client.name,
-                        items: lineItems,
-                        taxRate: taxPercent,
-                        discount: discountPercent,
                         status: status,
-                        signature: nil,
                         issueDate: issueDate,
                         dueDate: dueDate,
+                        items: items,
+                        taxRate: taxPercent,
+                        discount: discountPercent,
                         currency: "USD",
                         notes: notes,
-                        createdAt: Date()
+                        signature: signature
                     )
-                    newInvoice.signatureStrokes = signatureStrokes
-                    invoices.append(newInvoice)
+                    await MainActor.run {
+                        invoices.append(newInvoice)
+                    }
                 case .edit(let existing):
-                    if let index = invoices.firstIndex(where: { $0.id == existing.id }) {
-                        invoices[index].clientId = client.id
-                        invoices[index].clientName = client.name
-                        invoices[index].status = status
-                        invoices[index].issueDate = issueDate
-                        invoices[index].dueDate = dueDate
-                        invoices[index].lineItems = lineItems
-                        invoices[index].discountPercent = discountPercent
-                        invoices[index].taxPercent = taxPercent
-                        invoices[index].signatureStrokes = signatureStrokes
-                        invoices[index].notes = notes
+                    let updatedInvoice = try await Invoice.update(
+                        id: existing.id,
+                        clientId: client.id,
+                        status: status,
+                        issueDate: issueDate,
+                        dueDate: dueDate,
+                        items: items,
+                        taxRate: taxPercent,
+                        discount: discountPercent,
+                        currency: "USD",
+                        notes: notes,
+                        signature: signature
+                    )
+                    await MainActor.run {
+                        if let index = invoices.firstIndex(where: { $0.id == existing.id }) {
+                            invoices[index] = updatedInvoice
+                        }
                     }
                 }
-                isSaving = false
-                router.pop()
+                await MainActor.run {
+                    isSaving = false
+                    router.pop()
+                }
+            } catch {
+                await MainActor.run {
+                    isSaving = false
+                }
+                print("Failed to save invoice: \(error)")
             }
-        )
+        }
     }
 }
 
@@ -350,5 +369,6 @@ struct CreateInvoiceView: View {
             clients: [],
             invoices: .constant([])
         )
+        .environment(AppRouter())
     }
 }

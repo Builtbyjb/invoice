@@ -8,23 +8,24 @@
 import SwiftUI
 
 struct LogInView: View {
-    @Environment(Router.self) var router
+    @Environment(AuthRouter.self) var router
+    @Environment(AuthSession.self) private var authSession
 
     @State private var email: String = ""
     @State private var showValidateOTP: Bool = false
-    @State private var isValidated: Bool = false
+    @State private var otpEmail: String = ""
+    @State private var isLoading = false
+    @State private var showError = false
+    @State private var errorMessage = ""
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-
-                // View Title
                 Text("Sign In")
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.primary)
                     .padding(.top, 20)
 
-                // Form Fields
                 VStack(spacing: 16) {
                     customTextField(
                         title: "Email Address",
@@ -35,25 +36,50 @@ struct LogInView: View {
                     .autocapitalization(.none)
                 }
 
-                // Submit Button
                 Button {
-                    // Handle sign up action here
-                    showValidateOTP = true
+                    isLoading = true
+                    Task {
+                        defer { isLoading = false }
+                        do {
+                            let signInDetails = SignInDetails(email: email)
+                            let response = try await Auth.signIn(signInDetails: signInDetails)
+                            try TokenStore.shared.save(Token(accessToken: response.accessToken, refreshToken: ""))
+                            
+                            otpEmail = email
+                            showValidateOTP = true
+                        } catch {
+                            errorMessage = error.localizedDescription
+                            showError = true
+                        }
+                    }
                 } label: {
-                    Text("Sign In")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(.vertical, 14)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
-                        .cornerRadius(8)
+                    if isLoading {
+                        ProgressView()
+                            .tint(.white)
+                            .padding(.vertical, 14)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                    } else {
+                        Text("Sign In")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 14)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue)
+                            .cornerRadius(8)
+                    }
                 }
+                .disabled(isLoading)
                 .padding(.top, 10)
+                .alert("Sign In Failed", isPresented: $showError) {
+                    Button("OK", role: .cancel) {}
+                } message: {
+                    Text(errorMessage)
+                }
 
                 Button("Don't have an account? Sign Up") {
-                    // Remove last item on the navigation stack
                     router.pop()
-
                     router.navigate(to: .signUp)
                 }
             }
@@ -61,7 +87,10 @@ struct LogInView: View {
             .sheet(isPresented: $showValidateOTP) {
                 NavigationStack {
                     VStack {
-                        ValidateOTPView(isPresented: $isValidated)
+                        ValidateOTPView(
+                            isPresented: $showValidateOTP,
+                            email: otpEmail
+                        )
                     }
                     .navigationTitle("OTP Verification")
                     .navigationBarTitleDisplayMode(.inline)
@@ -71,7 +100,6 @@ struct LogInView: View {
         }
     }
 
-    // Helper view building component for input fields
     @ViewBuilder
     private func customTextField(
         title: String,
@@ -92,5 +120,5 @@ struct LogInView: View {
 }
 
 #Preview {
-    LogInView().environment(Router.shared)
+    LogInView().environment(AuthRouter()).environment(AuthSession.shared)
 }

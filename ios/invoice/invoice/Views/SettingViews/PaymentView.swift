@@ -1,20 +1,20 @@
 //
-//  HelpView.swift
+//  PaymentView.swift
 //  invoice
 //
-//  Created by Ajibola Awotide on 2026-06-26.
+//  Created by OpenCode on 2026-07-22.
 //
 
 import SwiftUI
 
-struct HelpView: View {
+struct PaymentView: View {
     var body: some View {
-        Text("Help")
+        Text("Payment")
             .font(.largeTitle)
             .toolbar(.hidden, for: .tabBar)
     }
 }
 
 #Preview {
-    HelpView()
+    PaymentView()
 }

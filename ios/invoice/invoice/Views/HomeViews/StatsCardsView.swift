@@ -10,6 +10,7 @@ import SwiftUI
 struct StatsCardsView: View {
     let stats: DashboardStats
     let isLoading: Bool
+    @State private var selectedCurrency: String?
 
     private let columns = [
         GridItem(.flexible()),
@@ -17,38 +18,41 @@ struct StatsCardsView: View {
     ]
 
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 16) {
-            StatCard(
-                title: "Total Revenue",
-                value: formatCurrency(stats.totalRevenue, currency: stats.currency),
-                icon: "dollarsign.circle.fill",
-                iconColor: .blue,
-                isLoading: isLoading
-            )
+        if isLoading {
+            DefaultLoadingView()
+                .frame(minHeight: 120)
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+        } else {
+            LazyVGrid(columns: columns, spacing: 16) {
+                StatCard(
+                    title: "Paid Invoices",
+                    value: "\(stats.paidCount)",
+                    icon: "checkmark.circle.fill",
+                    iconColor: .green
+                )
+
+                StatCard(
+                    title: "Overdue Invoices",
+                    value: "\(stats.overdueCount)",
+                    icon: "exclamationmark.triangle.fill",
+                    iconColor: .red
+                )
+                
+                StatCard(
+                    title: "Sent Invoices",
+                    value: "\(stats.sentCount)",
+                    icon: "checkmark.circle",
+                    iconColor: .orange
+                )
 
             StatCard(
-                title: "Paid Invoices",
-                value: "\(stats.paidCount)",
-                icon: "checkmark.circle.fill",
-                iconColor: .green,
-                isLoading: isLoading
+                title: "Draft Invoices",
+                value: "\(stats.draftCount)",
+                icon: "doc.text",
+                iconColor: .red
             )
-
-            StatCard(
-                title: "Pending Invoices",
-                value: "\(stats.pendingCount)",
-                icon: "clock.fill",
-                iconColor: .orange,
-                isLoading: isLoading
-            )
-
-            StatCard(
-                title: "Overdue Invoices",
-                value: "\(stats.overdueCount)",
-                icon: "exclamationmark.triangle.fill",
-                iconColor: .red,
-                isLoading: isLoading
-            )
+            }
         }
     }
 
@@ -61,12 +65,12 @@ struct StatsCardsView: View {
     }
 }
 
+
 struct StatCard: View {
     let title: String
     let value: String
     let icon: String
     let iconColor: Color
-    let isLoading: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -98,19 +102,25 @@ struct StatCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shimmer(active: isLoading)
     }
 }
 
 #Preview {
+    let sampleStats = DashboardStats(
+        paidCount: 12,
+        sentCount: 4,
+        overdueCount: 2,
+        draftCount: 8,
+    )
+
     VStack {
         StatsCardsView(
-            stats: DashboardStats(totalRevenue: 0, paidCount: 0, pendingCount: 0, overdueCount: 0, currency: "N/A"),
+            stats: sampleStats,
             isLoading: true
         ).padding()
 
         StatsCardsView(
-            stats: DashboardStats(totalRevenue: 0, paidCount: 0, pendingCount: 0, overdueCount: 0, currency: "N/A"),
+            stats: sampleStats,
             isLoading: false
         ).padding()
     }

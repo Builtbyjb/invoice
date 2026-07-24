@@ -14,7 +14,7 @@ struct InvoiceView: View {
     @Binding var invoices: [Invoice]
     let clients: [Client]
     
-    @Environment(Router.self) var router
+    @Environment(AppRouter.self) var router
     
     @State private var showPDFPreview: Bool = false
     @State private var showPDFShare: Bool = false
@@ -137,7 +137,7 @@ struct InvoiceView: View {
     private var statusColor: Color {
         switch invoice.status {
         case .draft: return .gray
-        case .pending: return .blue
+        case .sent: return .blue
         case .paid: return .green
         case .overdue: return .red
         }
@@ -173,7 +173,7 @@ struct InvoiceView: View {
                 
                 Divider()
                 
-                ForEach(invoice.lineItems) { item in
+                ForEach(invoice.items, id: \.self) { item in
                     HStack {
                         Text(item.description)
                             .font(.subheadline)
@@ -190,7 +190,7 @@ struct InvoiceView: View {
                     }
                     .padding(.vertical, 8)
                     
-                    if item.id != invoice.lineItems.last?.id {
+                    if item != invoice.items.last {
                         Divider()
                     }
                 }
@@ -374,7 +374,6 @@ struct ShareSheet: UIViewControllerRepresentable {
                 clientName: "Acme Corp",
                 items: [
                     InvoiceItem(
-                        id: UUID(),
                         description: "Widget",
                         quantity: 2,
                         unit: "ea",
@@ -383,7 +382,7 @@ struct ShareSheet: UIViewControllerRepresentable {
                 ],
                 taxRate: 10,
                 discount: 5,
-                status: .pending,
+                status: .sent,
                 signature: nil,
                 issueDate: Date(),
                 dueDate: Date(),
@@ -394,5 +393,5 @@ struct ShareSheet: UIViewControllerRepresentable {
             invoices: .constant([]),
             clients: []
         )
-    }.environment(Router.shared)
+    }.environment(AppRouter())
 }

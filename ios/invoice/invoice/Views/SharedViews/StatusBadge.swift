@@ -23,7 +23,7 @@ struct StatusBadge: View {
     var statusColor: Color {
         switch status {
         case .draft: return .gray
-        case .pending: return .blue
+        case .sent: return .blue
         case .paid: return .green
         case .overdue: return .red
         }

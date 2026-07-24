@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AuthView: View {
-    @State private var router = Router.shared
+    @State private var router = AuthRouter()
 
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -48,7 +48,7 @@ struct AuthView: View {
                 }
                 .buttonStyle(.glass)
             }
-            .navigationDestination(for: Route.self) { route in
+            .navigationDestination(for: AuthRoute.self) { route in
                 router.switchView(route: route)
             }
         }
@@ -57,5 +57,5 @@ struct AuthView: View {
 }
 
 #Preview {
-    AuthView()
+    AuthView().environment(AuthSession.shared).environment(AuthRouter())
 }

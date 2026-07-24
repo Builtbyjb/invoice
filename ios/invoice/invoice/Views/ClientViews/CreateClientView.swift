@@ -116,38 +116,50 @@ struct CreateClientView: View {
     }
 
     private func save() {
+        guard isFormValid else { return }
         isSaving = true
 
-        // Simulate async save
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            switch mode {
-            case .create:
-                let newClient = Client(
-                    id: "1",
-                    organizationId: 1,
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    address: address,
-                    city: city,
-                    country: country,
-                    createdAt: Date().ISO8601Format()
-                )
-                clients.append(newClient)
-            case .edit(let existing):
-                if let index = clients.firstIndex(where: {
-                    $0.id == existing.id
-                }) {
-                    clients[index].name = name
-                    clients[index].email = email
-                    clients[index].phone = phone
-                    clients[index].address = address
-                    clients[index].city = city
-                    clients[index].country = country
+        Task {
+            do {
+                switch mode {
+                case .create:
+                    let newClient = try await Client.create(
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        address: address,
+                        city: city,
+                        country: country
+                    )
+                    await MainActor.run {
+                        clients.append(newClient)
+                    }
+                case .edit(let existing):
+                    let updatedClient = try await Client.update(
+                        id: existing.id,
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        address: address,
+                        city: city,
+                        country: country
+                    )
+                    await MainActor.run {
+                        if let index = clients.firstIndex(where: { $0.id == existing.id }) {
+                            clients[index] = updatedClient
+                        }
+                    }
                 }
+                await MainActor.run {
+                    isSaving = false
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    isSaving = false
+                }
+                print("Failed to save client: \(error)")
             }
-            isSaving = false
-            dismiss()
         }
     }
 }

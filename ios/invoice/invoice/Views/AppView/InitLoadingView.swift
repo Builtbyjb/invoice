@@ -9,7 +9,8 @@ import SwiftUI
 
 struct InitLoadingView: View {
     var body: some View {
-        Text("ACorp Invoice").font(.largeTitle.bold())
+            Text("ACorp Invoice")
+                .font(.largeTitle.bold())
     }
 }
 

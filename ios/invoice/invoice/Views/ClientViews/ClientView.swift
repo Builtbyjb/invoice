@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ClientView: View {
-    @Environment(Router.self) var router
+    @Environment(AppRouter.self) var router
     let client: Client
     @Binding var clients: [Client]
 
@@ -67,7 +67,7 @@ struct ClientView: View {
         }
         .task {
             do {
-                clientInvoices = try await Invoice.fetchClientInvoices()
+                clientInvoices = try await Invoice.fetchClientInvoices(clientId: client.id)
             } catch {
                 print(error)
             }
@@ -147,5 +147,5 @@ struct InfoRow: View {
                 )
             ])
         )
-    }.environment(Router.shared)
+    }.environment(AppRouter())
 }

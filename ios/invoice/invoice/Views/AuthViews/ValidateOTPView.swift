@@ -10,8 +10,20 @@ import Combine
 
 struct ValidateOTPView: View {
     @Binding var isPresented: Bool
+    @Environment(AuthSession.self) private var authSession
+    
+    let email: String
+    
     @State private var otpCode: String = ""
     @FocusState private var isFieldFocused: Bool
+    
+    @State private var isLoading = false
+    @State private var showError = false
+    @State private var errorMessage = ""
+    
+    @State private var isResending = false
+    @State private var showResendError = false
+    @State private var resendErrorMessage = ""
     
     // Timer States
     @State private var timeRemaining = 60
@@ -78,29 +90,61 @@ struct ValidateOTPView: View {
             
             // Primary Submission Button
             Button {
-                print("Verifying OTP: \(otpCode)")
+                isLoading = true
+                Task {
+                    defer { isLoading = false }
+                    do {
+                        let otpDetails = OTPDetails(code: otpCode)
+                        guard let token = try TokenStore.shared.read() else { return }
+                        
+                        _ = try await Auth.verifyOTP(otpDetails: otpDetails, tempToken: token.accessToken)
+                        isPresented = false
+                        authSession.markAuthenticated()
+                    } catch {
+                        errorMessage = error.localizedDescription
+                        showError = true
+                    }
+                }
             } label: {
-                Text("Verify Code")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding(.vertical, 14)
-                    .frame(maxWidth: .infinity)
-                    .background(otpCode.count == maxDigits ? Color.blue : Color.gray.opacity(0.4))
-                    .cornerRadius(8)
+                if isLoading {
+                    ProgressView()
+                        .tint(.white)
+                        .padding(.vertical, 14)
+                        .frame(maxWidth: .infinity)
+                        .background(otpCode.count == maxDigits ? Color.blue : Color.gray.opacity(0.4))
+                        .cornerRadius(8)
+                } else {
+                    Text("Verify Code")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding(.vertical, 14)
+                        .frame(maxWidth: .infinity)
+                        .background(otpCode.count == maxDigits ? Color.blue : Color.gray.opacity(0.4))
+                        .cornerRadius(8)
+                }
             }
-            .disabled(otpCode.count < maxDigits)
+            .disabled(otpCode.count < maxDigits || isLoading)
             .padding(.horizontal, 16)
+            .alert("Verification Failed", isPresented: $showError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage)
+            }
             
             // Reactive Resend Code Action & Timer UI
             VStack(spacing: 8) {
                 Button {
                     resendOTPCode()
                 } label: {
-                    Text("Resend Code")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundColor(isTimerActive ? .gray : .blue)
+                    if isResending {
+                        ProgressView()
+                    } else {
+                        Text("Resend Code")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundColor(isTimerActive ? .gray : .blue)
+                    }
                 }
-                .disabled(isTimerActive) // Disallows clicking while timer runs
+                .disabled(isTimerActive || isResending)
                 
                 if isTimerActive {
                     Text("Resend available in \(timeString(from: timeRemaining))")
@@ -108,18 +152,29 @@ struct ValidateOTPView: View {
                         .foregroundColor(.gray)
                 }
             }
+            .alert("Resend Failed", isPresented: $showResendError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(resendErrorMessage)
+            }
         }
         .padding(24)
         .onAppear {
             startTimer()
         }
-        // Fired every single second by the autoconnected publisher
         .onReceive(timer) { _ in
             guard isTimerActive else { return }
             if timeRemaining > 0 {
                 timeRemaining -= 1
             } else {
                 isTimerActive = false
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    isPresented = false
+                }
             }
         }
     }
@@ -161,11 +216,18 @@ struct ValidateOTPView: View {
     
     // Resets state logic to begin counting down again
     private func resendOTPCode() {
-        // Trigger your API network logic here
-        print("New OTP requested...")
-        
-        timeRemaining = 60
-        isTimerActive = true
+        isResending = true
+        Task {
+            defer { isResending = false }
+            do {
+                _ = try await Auth.resendOTP(email: email)
+                timeRemaining = 60
+                isTimerActive = true
+            } catch {
+                resendErrorMessage = error.localizedDescription
+                showResendError = true
+            }
+        }
     }
     
     private func startTimer() {
@@ -176,5 +238,9 @@ struct ValidateOTPView: View {
 }
 
 #Preview {
-    ValidateOTPView(isPresented: .constant(true))
+    ValidateOTPView(
+        isPresented: .constant(true),
+        email: "name@example.com",
+    )
+    .environment(AuthSession.shared)
 }

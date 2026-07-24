@@ -257,11 +257,11 @@ struct InvoicePDFGenerator {
         currencyFormatter.numberStyle = .currency
         currencyFormatter.currencyCode = "USD"
 
-        for item in invoice.lineItems {
+        for (index, item) in invoice.items.enumerated() {
             let rowRect = CGRect(x: tableX, y: cursorY, width: tableWidth, height: rowHeight)
 
             // Alternate row background
-            if invoice.lineItems.firstIndex(where: { $0.id == item.id })?.isMultiple(of: 2) == false {
+            if index.isMultiple(of: 2) == false {
                 UIColor.systemGray6.withAlphaComponent(0.3).setFill()
                 UIBezierPath(rect: rowRect).fill()
             }

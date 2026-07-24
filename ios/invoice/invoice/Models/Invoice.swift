@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-public enum InvoiceStatus: String, Equatable, Hashable, CaseIterable {
+public enum InvoiceStatus: String, Equatable, Hashable, CaseIterable, Codable {
     case draft
-    case pending
+    case sent
     case paid
     case overdue
 }
@@ -40,8 +40,8 @@ struct CGPointWrapper: Codable {
 struct Stroke: Codable {
     let points: [CGPointWrapper]
 }
-struct InvoiceItem: Equatable, Hashable, Identifiable {
-    var id: UUID
+
+struct InvoiceItem: Equatable, Hashable, Codable {
     var description: String
     var quantity: Double
     var unit: String? = nil
@@ -52,7 +52,7 @@ struct InvoiceItem: Equatable, Hashable, Identifiable {
     }
 }
 
-struct Invoice: Equatable, Hashable, Identifiable {
+struct Invoice: Equatable, Hashable, Identifiable, Codable {
     public var id: String
     public var invoiceNumber: String
     public var clientId: String
@@ -67,31 +67,6 @@ struct Invoice: Equatable, Hashable, Identifiable {
     public var currency: String
     public var notes: String
     public var createdAt: Date
-
-    var lineItems: [InvoiceItem] {
-        get {
-            items.map {
-                InvoiceItem(
-                    id: UUID(),
-                    description: $0.description,
-                    quantity: Double($0.quantity),
-                    unit: $0.unit,
-                    price: $0.price
-                )
-            }
-        }
-        set {
-            items = newValue.map {
-                InvoiceItem(
-                    id: UUID(),
-                    description: $0.description,
-                    quantity: Double($0.quantity),
-                    unit: $0.unit,
-                    price: $0.price
-                )
-            }
-        }
-    }
 
     var discountPercent: Double {
         get { discount }
@@ -123,7 +98,7 @@ struct Invoice: Equatable, Hashable, Identifiable {
     }
 
     var subtotal: Double {
-        lineItems.reduce(0) { $0 + $1.total }
+        items.reduce(0) { $0 + $1.total }
     }
 
     var discountAmount: Double {
@@ -145,10 +120,107 @@ struct Invoice: Equatable, Hashable, Identifiable {
     }()
 
     static func fetchInvoices() async throws -> [Invoice] {
-        return []
+        return try await APIClient.shared.request(
+            path: "/api/v1/invoices",
+            method: "GET",
+            requiresAuth: true
+        )
     }
 
-    static func fetchClientInvoices() async throws -> [Invoice] {
-        return []
+    static func fetchClientInvoices(clientId: String) async throws -> [Invoice] {
+        return try await APIClient.shared.request(
+            path: "/api/v1/clients/\(clientId)/invoices",
+            method: "GET",
+            requiresAuth: true
+        )
     }
+
+    static func create(
+        clientId: String,
+        status: InvoiceStatus,
+        issueDate: Date,
+        dueDate: Date,
+        items: [InvoiceItem],
+        taxRate: Double,
+        discount: Double,
+        currency: String,
+        notes: String,
+        signature: String?
+    ) async throws -> Invoice {
+        let body = InvoiceRequest(
+            clientId: clientId,
+            status: status,
+            issueDate: issueDate,
+            dueDate: dueDate,
+            items: items,
+            taxRate: taxRate,
+            discount: discount,
+            currency: currency,
+            notes: notes,
+            signature: signature
+        )
+        return try await APIClient.shared.request(
+            path: "/api/v1/invoices",
+            method: "POST",
+            body: body,
+            requiresAuth: true
+        )
+    }
+
+    static func update(
+        id: String,
+        clientId: String,
+        status: InvoiceStatus,
+        issueDate: Date,
+        dueDate: Date,
+        items: [InvoiceItem],
+        taxRate: Double,
+        discount: Double,
+        currency: String,
+        notes: String,
+        signature: String?
+    ) async throws -> Invoice {
+        let body = InvoiceRequest(
+            clientId: clientId,
+            status: status,
+            issueDate: issueDate,
+            dueDate: dueDate,
+            items: items,
+            taxRate: taxRate,
+            discount: discount,
+            currency: currency,
+            notes: notes,
+            signature: signature
+        )
+        return try await APIClient.shared.request(
+            path: "/api/v1/invoices/\(id)",
+            method: "PUT",
+            body: body,
+            requiresAuth: true
+        )
+    }
+    
+    static func fetch(id: String) async throws -> Invoice {
+        #if DEBUG
+        if DemoData.invoice.id == id { return DemoData.invoice }
+        #endif
+        return try await APIClient.shared.request(
+            path: "/api/v1/invoices/\(id)",
+            method: "GET",
+            requiresAuth: true
+        )
+    }
+}
+
+private struct InvoiceRequest: Codable {
+    let clientId: String
+    let status: InvoiceStatus
+    let issueDate: Date
+    let dueDate: Date
+    let items: [InvoiceItem]
+    let taxRate: Double
+    let discount: Double
+    let currency: String
+    let notes: String
+    let signature: String?
 }

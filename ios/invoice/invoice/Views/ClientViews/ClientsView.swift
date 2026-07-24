@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-enum ClientFormRoute: Hashable {
-    case create
-    case edit(Client)
-}
-
 struct ClientsView: View {
-    @State var router = Router.shared
+    @State private var router: AppRouter
+    
+    init(router: AppRouter) {
+        _router = State(initialValue: router)
+    }
+    
     @State private var clients: [Client] = []
 //    @State private var invoices: [Invoice] = []
     @State private var searchText: String = ""
@@ -58,12 +58,13 @@ struct ClientsView: View {
             .navigationDestination(for: Client.self) { client in
                 router.switchToClientView(client: client, clients: $clients)
             }
-            .navigationDestination(for: Route.self) { route in
+            .navigationDestination(for: AppRoute.self) { route in
                 router.switchView(route: route)
             }
             .task {
                 do {
-                    clients = try await Client.fetchClients()
+                    let response = try await Client.fetchClients()
+                    clients = response.clients
                 } catch {
                     print(error)
                 }
@@ -88,26 +89,8 @@ struct ClientsView: View {
                     }
                 }
                 ToolbarItemGroup(placement: .topBarTrailing) {
-                    ControlGroup {
-                        Button(action: {
-                            router.navigate(to: .help)
-                        }) {
-                            Image(systemName: "questionmark.circle")
-                        }
-                        Button(action: {
-                            router.navigate(to: .notification)
-                        }) {
-                            Image(systemName: "bell")
-                        }
-                        Button(action: {
-                            router.navigate(to: .settings)
-
-                        }) {
-                            Image(systemName: "gear")
-                        }
-                    }
+                    TopBarButtons()
                 }
-
             }.safeAreaInset(edge: .bottom) {
                 if showSearchBar {
                     SearchBarView(showSearchBar: $showSearchBar, searchText: $searchText, placeholder: "Search")
@@ -118,5 +101,5 @@ struct ClientsView: View {
 }
 
 #Preview {
-    ClientsView()
+    ClientsView(router: AppRouter())
 }

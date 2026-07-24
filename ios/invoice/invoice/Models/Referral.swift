@@ -12,7 +12,11 @@ struct Referral: Codable {
     public var payout: Double
     public var referralCode: String
     
-    static func fetchReferralData() async throws -> Void {
-        return
+    static func fetchReferralData() async throws -> Referral {
+        return try await APIClient.shared.request(
+            path: "/api/v1/referral/details",
+            method: "GET",
+            requiresAuth: true
+        )
     }
 }
