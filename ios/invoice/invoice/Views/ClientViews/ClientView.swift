@@ -9,11 +9,10 @@ import SwiftUI
 
 struct ClientView: View {
     @Environment(AppRouter.self) var router
-    let client: Client
-    @Binding var clients: [Client]
+    @Environment(AppCoordinator.self) var coordinator
+    @State var client: Client
 
     @State private var showEditClient: Bool = false
-    @State private var clientInvoices: [Invoice] = []
 
     var body: some View {
         ScrollView {
@@ -22,9 +21,9 @@ struct ClientView: View {
                     ZStack {
                         Circle()
                             .fill(Color.blue.opacity(0.15))
-                            .frame(width: 56, height: 56)
+                            .frame(width: 42, height: 42)
                         Text(String(client.name.prefix(1)))
-                            .font(.system(size: 24, weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(.blue)
                     }
 
@@ -38,67 +37,56 @@ struct ClientView: View {
                 Divider()
 
                 VStack(alignment: .leading, spacing: 12) {
-                    InfoRow(icon: "envelope.fill", label: "Email", value: client.email)
-                    InfoRow(icon: "phone.fill", label: "Phone", value: client.phone)
-                    InfoRow(icon: "house.fill", label: "Address", value: client.address)
-                    InfoRow(icon: "building.2.fill", label: "City", value: client.city)
+                    InfoRow(icon: "envelope", label: "Email", value: client.email)
+                    InfoRow(icon: "phone", label: "Phone", value: client.phone)
+                    InfoRow(icon: "house", label: "Address", value: client.address)
+                    InfoRow(icon: "building.2", label: "City", value: client.city)
                     InfoRow(icon: "globe", label: "Country", value: client.country)
+                    InfoRow(icon: "text.document", label: "Notes", value: client.note ?? "")
                 }
-
-                Spacer()
-
-//                Button {
-//                    // Handle Invoices viewing action here
-//                } label: {
-//                    Text("View Invoices")
-//                        .font(.headline)
-//                        .foregroundColor(.white)
-//                        .padding(.vertical, 10)
-//                        .frame(maxWidth: .infinity)
-//                        .background(Color.blue)
-//                        .cornerRadius(8)
-//                }
-//                .padding(.top, 10)
             }
             .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(16)
-            .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
         }
-        .task {
-            do {
-                clientInvoices = try await Invoice.fetchClientInvoices(clientId: client.id)
-            } catch {
-                print(error)
-            }
-        }
-        .padding()
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 ControlGroup {
                     Button {
-                        if clients.first(where: { $0.id == client.id }) != nil {
-                            showEditClient.toggle()
-                        }
-                    } label: {
-                        Image(systemName: "square.and.pencil")
-                    }
-
-                    Button {
-                        // Handle view all clients invoices
-                        print("View invoices")
+                        coordinator.pendingInvoiceSearchToken = SearchToken(
+                            tag: "client",
+                            value: client.id,
+                            label: client.name
+                        )
+                        coordinator.selectedTab = .invoices
                     } label: {
                         Image(systemName: "document.badge.ellipsis")
                     }
+                    
+                    Button {
+                        showEditClient.toggle()
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+                    
+                    Button {
+                        Task {
+                            do {
+                                let _ = try await Client.delete(id: client.id)
+                                router.pop()
+                            } catch {
+                                print(error.localizedDescription)
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "trash").foregroundColor(.red)
+                    }
+
+
                 }
             }
         }
         .sheet(isPresented: $showEditClient) {
-            if let liveClient = clients.first(where: { $0.id == client.id }) {
-                NavigationStack {
-                    router.switchToClientCreateView(mode: .edit(liveClient), clients: $clients)
-                }
-                .presentationDragIndicator(.visible)
+            CreateClientView(mode: .edit(client)) { updatedClient in
+                client = updatedClient
             }
         }
     }
@@ -140,21 +128,10 @@ struct InfoRow: View {
                 address: "",
                 city: "Toronto",
                 country: "Canada",
+                note: "",
                 createdAt: "now"
             ),
-            clients: .constant([
-                Client(
-                    id: "3",
-                    organizationId: 2,
-                    name: "Client2",
-                    email: "client2@example.com",
-                    phone: "+1 234 567 8900",
-                    address: "",
-                    city: "Toronto",
-                    country: "Canada",
-                    createdAt: "now"
-                )
-            ])
         )
     }.environment(AppRouter())
+    .environment(AppCoordinator())
 }

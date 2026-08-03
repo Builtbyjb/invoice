@@ -24,6 +24,9 @@ enum DeepLink: Equatable {
 @Observable
 final class AppCoordinator {
     var selectedTab: AppTab = .home
+
+    /// One-shot filter handed to InvoicesView when switching tabs from a client detail.
+    var pendingInvoiceSearchToken: SearchToken? = nil
     
     let homeRouter = AppRouter()
     let clientsRouter = AppRouter()
@@ -37,7 +40,10 @@ final class AppCoordinator {
         case .client(let id):
             let client: Client
             do {
-                client = try await Client.fetch(id: id)
+                let response = try await Client.fetch(id: id)
+                if let res = response.data {
+                   client =  res
+                } else { return }
             } catch {
                 selectedTab = .clients
                 return
@@ -49,7 +55,10 @@ final class AppCoordinator {
         case .invoice(let id):
             let invoice: Invoice
             do {
-                invoice = try await Invoice.fetch(id: id)
+                let response = try await Invoice.fetch(id: id)
+                if let res = response.data {
+                    invoice =  res
+                } else { return }
             } catch {
                 selectedTab = .invoices
                 return

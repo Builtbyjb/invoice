@@ -5,10 +5,7 @@
 //  Created by Ajibola Awotide on 2026-07-10.
 //
 
-struct ClientResponse: Decodable {
-    public var message: String
-    public var clients: [Client]
-}
+import Foundation
 
 private struct ClientRequest: Encodable {
     let name: String
@@ -17,6 +14,7 @@ private struct ClientRequest: Encodable {
     let address: String
     let city: String
     let country: String
+    let note: String
 }
 
 public struct Client: Equatable, Hashable, Identifiable, Codable {
@@ -28,6 +26,7 @@ public struct Client: Equatable, Hashable, Identifiable, Codable {
     public var address: String
     public var city: String
     public var country: String
+    public var note: String?
     public var createdAt: String
 
     public init(
@@ -39,6 +38,7 @@ public struct Client: Equatable, Hashable, Identifiable, Codable {
         address: String,
         city: String,
         country: String,
+        note: String,
         createdAt: String
     ) {
         self.id = id
@@ -49,12 +49,22 @@ public struct Client: Equatable, Hashable, Identifiable, Codable {
         self.address = address
         self.city = city
         self.country = country
+        self.note = note
         self.createdAt = createdAt
     }
 
-    static func fetchClients() async throws -> ClientResponse {
+    static func fetchClients() async throws -> Response<[Client]> {
         return try await APIClient.shared.request(
             path: "/api/v1/clients",
+            method: "GET",
+            requiresAuth: true
+        )
+    }
+
+    static func search(query: String) async throws -> Response<[Client]> {
+        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
+        return try await APIClient.shared.request(
+            path: "/api/v1/clients?search=\(encoded)",
             method: "GET",
             requiresAuth: true
         )
@@ -66,15 +76,17 @@ public struct Client: Equatable, Hashable, Identifiable, Codable {
         phone: String,
         address: String,
         city: String,
-        country: String
-    ) async throws -> Client {
+        country: String,
+        note: String
+    ) async throws -> Response<Client> {
         let body = ClientRequest(
             name: name,
             email: email,
             phone: phone,
             address: address,
             city: city,
-            country: country
+            country: country,
+            note: note,
         )
         return try await APIClient.shared.request(
             path: "/api/v1/clients/create",
@@ -91,33 +103,39 @@ public struct Client: Equatable, Hashable, Identifiable, Codable {
         phone: String,
         address: String,
         city: String,
-        country: String
-    ) async throws -> Client {
+        country: String,
+        note: String
+    ) async throws -> Response<Client> {
         let body = ClientRequest(
             name: name,
             email: email,
             phone: phone,
             address: address,
             city: city,
-            country: country
+            country: country,
+            note: note
         )
         return try await APIClient.shared.request(
-            path: "/api/v1/clients/\(id)",
+            path: "/api/v1/clients/\(id)/edit",
             method: "PUT",
             body: body,
             requiresAuth: true
         )
     }
-    
-    static func fetch(id: String) async throws -> Client {
-        #if DEBUG
-        if DemoData.client.id == id { return DemoData.client }
-        #endif
+
+    static func fetch(id: String) async throws -> Response<Client> {
         return try await APIClient.shared.request(
             path: "/api/v1/clients/\(id)",
             method: "GET",
             requiresAuth: true
         )
     }
+    
+    static func delete(id: String) async throws -> Response<Client> {
+        return try await APIClient.shared.request(
+            path: "/api/v1/clients/\(id)/delete",
+            method: "DELETE",
+            requiresAuth: true
+        )
+    }
 }
-

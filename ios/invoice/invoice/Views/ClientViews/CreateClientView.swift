@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct CreateClientView: View {
-    let mode: ClientFormRoute
-    @Binding var clients: [Client]
+    let mode: ClientFormMode
+    let onSave: ((Client) -> Void)?
     @Environment(\.dismiss) var dismiss
 
     @State private var name: String = ""
@@ -18,11 +18,12 @@ struct CreateClientView: View {
     @State private var address: String = ""
     @State private var city: String = ""
     @State private var country: String = ""
+    @State private var note: String = ""
     @State private var isSaving: Bool = false
 
-    init(mode: ClientFormRoute, clients: Binding<[Client]>) {
+    init(mode: ClientFormMode, onSave: ((Client) -> Void)? = nil) {
         self.mode = mode
-        self._clients = clients
+        self.onSave = onSave
 
         switch mode {
         case .create:
@@ -34,6 +35,7 @@ struct CreateClientView: View {
             _address = State(initialValue: client.address)
             _city = State(initialValue: client.city)
             _country = State(initialValue: client.country)
+            _note = State(initialValue: client.note ?? "")
         }
     }
 
@@ -49,68 +51,75 @@ struct CreateClientView: View {
     }
 
     var body: some View {
-        Form {
-            Section("Contact Information") {
-                LabeledTextField(
-                    title: "Name",
-                    text: $name,
-                    icon: "person.fill"
-                )
-                LabeledTextField(
-                    title: "Email",
-                    text: $email,
-                    icon: "envelope.fill",
-                    keyboard: .emailAddress
-                )
-                LabeledTextField(
-                    title: "Phone Number",
-                    text: $phone,
-                    icon: "phone.fill",
-                    keyboard: .phonePad
-                )
-            }
+        NavigationStack {
+            Form {
+                Section("Contact Information") {
+                    LabeledTextField(
+                        title: "Name",
+                        text: $name,
+                        icon: "person.fill"
+                    )
+                    LabeledTextField(
+                        title: "Email",
+                        text: $email,
+                        icon: "envelope.fill",
+                        keyboard: .emailAddress
+                    )
+                    LabeledTextField(
+                        title: "Phone Number",
+                        text: $phone,
+                        icon: "phone.fill",
+                        keyboard: .phonePad
+                    )
+                }
 
-            Section("Address") {
-                LabeledTextField(
-                    title: "Street Address",
-                    text: $address,
-                    icon: "house.fill"
-                )
-                LabeledTextField(
-                    title: "City",
-                    text: $city,
-                    icon: "building.2.fill"
-                )
-                LabeledTextField(
-                    title: "Country",
-                    text: $country,
-                    icon: "globe"
-                )
-            }
-        }
-        .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 17, weight: .semibold))
+                Section("Address") {
+                    LabeledTextField(
+                        title: "Street Address",
+                        text: $address,
+                        icon: "house.fill"
+                    )
+                    LabeledTextField(
+                        title: "City",
+                        text: $city,
+                        icon: "building.2.fill"
+                    )
+                    LabeledTextField(
+                        title: "Country",
+                        text: $country,
+                        icon: "globe"
+                    )
+                }
+
+                Section("Notes") {
+                    TextEditor(text: $note)
+                        .frame(minHeight: 100)
                 }
             }
-            ToolbarItem(placement: .confirmationAction) {
-                Button {
-                    save()
-                } label: {
-                    if isSaving {
-                        ProgressView()
-                    } else {
-                        Image(systemName: "checkmark")
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark")
                             .font(.system(size: 17, weight: .semibold))
                     }
                 }
-                .disabled(!isFormValid || isSaving)
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        save()
+                    } label: {
+                        if isSaving {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 17, weight: .semibold))
+                        }
+                    }
+                    .disabled(!isFormValid || isSaving)
+                }
             }
         }
     }
@@ -123,30 +132,35 @@ struct CreateClientView: View {
             do {
                 switch mode {
                 case .create:
-                    let newClient = try await Client.create(
+                    let response = try await Client.create(
                         name: name,
                         email: email,
                         phone: phone,
                         address: address,
                         city: city,
-                        country: country
+                        country: country,
+                        note: note
                     )
+                    print(response)
                     await MainActor.run {
-                        clients.append(newClient)
+                        if let client = response.data {
+                            onSave?(client)
+                        }
                     }
                 case .edit(let existing):
-                    let updatedClient = try await Client.update(
+                    let response = try await Client.update(
                         id: existing.id,
                         name: name,
                         email: email,
                         phone: phone,
                         address: address,
                         city: city,
-                        country: country
+                        country: country,
+                        note: note
                     )
                     await MainActor.run {
-                        if let index = clients.firstIndex(where: { $0.id == existing.id }) {
-                            clients[index] = updatedClient
+                        if let client = response.data {
+                            onSave?(client)
                         }
                     }
                 }
@@ -177,11 +191,12 @@ struct LabeledTextField: View {
                 .frame(width: 24)
             TextField(title, text: $text)
                 .keyboardType(keyboard)
+                .autocapitalization(.none)
         }
         .padding(.vertical, 4)
     }
 }
 
 #Preview {
-    CreateClientView(mode: .create, clients: .constant([]))
+    CreateClientView(mode: .create)
 }

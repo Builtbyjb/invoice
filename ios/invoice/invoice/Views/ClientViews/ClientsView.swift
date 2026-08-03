@@ -8,32 +8,24 @@
 import SwiftUI
 
 struct ClientsView: View {
+    @Environment(AppCoordinator.self) var coordinator
     @State private var router: AppRouter
-    
-    init(router: AppRouter) {
+    @State private var clients: [Client]
+
+    init(router: AppRouter, clients: [Client] = []) {
         _router = State(initialValue: router)
+        _clients = State(initialValue: clients)
     }
     
-    @State private var clients: [Client] = []
-//    @State private var invoices: [Invoice] = []
     @State private var searchText: String = ""
     @State private var showSearchBar: Bool = false
     @State private var showCreateClient: Bool = false
-
-    var filteredClients: [Client] {
-        if searchText.isEmpty { return clients }
-        return clients.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText)
-                || $0.email.localizedCaseInsensitiveContains(searchText)
-                || $0.city.localizedCaseInsensitiveContains(searchText)
-        }
-    }
 
     var body: some View {
         NavigationStack(path: $router.path) {
             ScrollView {
                 VStack(spacing: 12) {
-                    if filteredClients.isEmpty {
+                    if clients.isEmpty {
                         ContentUnavailableView(
                             "No Clients",
                             systemImage: "person.crop.circle.badge.xmark",
@@ -43,7 +35,7 @@ struct ClientsView: View {
                         )
                         .padding(.top, 40)
                     } else {
-                        ForEach(filteredClients) { client in
+                        ForEach(clients) { client in
                             NavigationLink(value: client) {
                                 ClientCard(client: client)
                             }
@@ -56,7 +48,7 @@ struct ClientsView: View {
             }
             .navigationTitle("Clients")
             .navigationDestination(for: Client.self) { client in
-                router.switchToClientView(client: client, clients: $clients)
+                router.switchToClientView(client: client)
             }
             .navigationDestination(for: AppRoute.self) { route in
                 router.switchView(route: route)
@@ -64,9 +56,13 @@ struct ClientsView: View {
             .task {
                 do {
                     let response = try await Client.fetchClients()
-                    clients = response.clients
+                    if let res = response.data {
+                        clients = res
+                    } else {
+                        clients = []
+                    }
                 } catch {
-                    print(error)
+                    print(error.localizedDescription)
                 }
             }
             .toolbar {
@@ -76,12 +72,7 @@ struct ClientsView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
-                    .sheet(isPresented: $showCreateClient) {
-                        NavigationStack {
-                            router.switchToClientCreateView(mode: .create, clients: $clients)
-                        }
-                        .presentationDragIndicator(.visible)
-                    }
+                    
                     Button {
                         showSearchBar.toggle()
                     } label: {
@@ -91,16 +82,25 @@ struct ClientsView: View {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     TopBarButtons()
                 }
-            }.safeAreaInset(edge: .bottom) {
+            }
+            .sheet(isPresented: $showCreateClient) {
+                CreateClientView(mode: .create) { newClient in
+                    clients.insert(newClient, at: 0)
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
                 if showSearchBar {
                     SearchBarView(showSearchBar: $showSearchBar, searchText: $searchText, placeholder: "Search")
                 }
             }
-        }.environment(router)
+        }
+        .environment(router)
+        .environment(coordinator)
     }
 }
 
 #Preview {
-    ClientsView(router: AppRouter())
+    ClientsView(router: AppRouter(), clients: DemoData.clients)
+        .environment(AppCoordinator())
         .withPreviewEnvironment()
 }

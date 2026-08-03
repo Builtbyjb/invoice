@@ -5,25 +5,21 @@
 //  Created by Ajibola Awotide on 2026-06-27.
 //
 
-import SwiftUI
 import QuickLook
+import SwiftUI
 import UIKit
 
 struct InvoiceView: View {
-    let invoice: Invoice
-    @Binding var invoices: [Invoice]
-    let clients: [Client]
-    
     @Environment(AppRouter.self) var router
-    
+    let invoice: Invoice
+
     @State private var showPDFPreview: Bool = false
     @State private var showPDFShare: Bool = false
     @State private var pdfTempURL: URL?
-    
+
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                headerActions
                 clientInfoCard
                 metaInfoCard
                 lineItemsCard
@@ -40,10 +36,32 @@ struct InvoiceView: View {
         .navigationTitle(invoice.invoiceNumber)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    router.path.append(InvoiceFormRoute.edit(invoice))
-                } label: {
-                    Image(systemName: "square.and.pencil")
+                ControlGroup {
+                    Button {
+                        router.path.append(InvoiceFormMode.edit(invoice))
+                    } label: {
+                        Image(systemName: "square.and.pencil")
+                    }
+
+                    // PDF Preview
+                    Button {
+                        generatePDF(preview: true)
+                    } label: {
+                        Image(systemName: "eye")
+                    }
+
+                    //  PDF Download
+                    Button {
+                        generatePDF(preview: false)
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                    }
+
+                    Button {
+                        print("Delete invoice")
+                    } label: {
+                        Image(systemName: "trash")
+                    }.foregroundColor(.red)
                 }
             }
         }
@@ -58,59 +76,31 @@ struct InvoiceView: View {
             }
         }
     }
-    
-    private var headerActions: some View {
-        HStack(spacing: 12) {
-            Button {
-                generatePDF(preview: true)
-            } label: {
-                Image(systemName: "eye.fill")
-                    .font(.system(size: 20))
-                    .frame(width: 44, height: 44)
-                    .background(Color.blue.opacity(0.1))
-                    .foregroundColor(.blue)
-                    .cornerRadius(10)
-            }
-            
-            Button {
-                generatePDF(preview: false)
-            } label: {
-                Image(systemName: "square.and.arrow.down.fill")
-                    .font(.system(size: 20))
-                    .frame(width: 44, height: 44)
-                    .background(Color.green.opacity(0.1))
-                    .foregroundColor(.green)
-                    .cornerRadius(10)
-            }
-            
-            Spacer()
-        }
-    }
-    
+
     private var clientInfoCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Billed To")
                 .font(.caption.weight(.semibold))
                 .foregroundColor(.secondary)
                 .textCase(.uppercase)
-            
-            HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(Color.blue.opacity(0.15))
-                        .frame(width: 40, height: 40)
-                    Text(String(invoice.clientName.prefix(1)))
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(.blue)
-                }
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(invoice.clientName)
-                        .font(.headline)
-//                    Text(invoice.client.email)
-//                        .font(.subheadline)
-//                        .foregroundColor(.secondary)
-                }
+
+            VStack(alignment: .leading, spacing: 2) {
+
+                Text(invoice.clientName)
+                    .font(.headline)
+
+                Text(invoice.clientInfo.email)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(invoice.clientInfo.address)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(invoice.clientInfo.city)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Text(invoice.clientInfo.Country)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
         }
         .padding()
@@ -119,9 +109,9 @@ struct InvoiceView: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
-    
+
     private var metaInfoCard: some View {
-        HStack(spacing: 0) {
+        HStack {
             MetaItem(label: "Status", value: invoice.status.rawValue, valueColor: statusColor)
             Divider()
             MetaItem(label: "Issue Date", value: invoice.issueDate.formatted(date: .abbreviated, time: .omitted))
@@ -133,7 +123,7 @@ struct InvoiceView: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
-    
+
     private var statusColor: Color {
         switch invoice.status {
         case .draft: return .gray
@@ -142,56 +132,57 @@ struct InvoiceView: View {
         case .overdue: return .red
         }
     }
-    
+
     private var lineItemsCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Items")
                 .font(.caption.weight(.semibold))
                 .foregroundColor(.secondary)
                 .textCase(.uppercase)
-            
-            VStack(spacing: 0) {
-                HStack {
-                    Text("Description")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Text("Qty")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.secondary)
-                        .frame(width: 50, alignment: .center)
-                    Text("Price")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.secondary)
-                        .frame(width: 70, alignment: .trailing)
-                    Text("Total")
-                        .font(.caption.weight(.semibold))
-                        .foregroundColor(.secondary)
-                        .frame(width: 70, alignment: .trailing)
-                }
-                .padding(.bottom, 8)
-                
-                Divider()
-                
+
+            VStack(alignment: .leading, spacing: 8) {
                 ForEach(invoice.items, id: \.self) { item in
-                    HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Description")
+                            .font(.caption.weight(.semibold))
+                            .foregroundColor(.secondary)
+
                         Text(item.description)
-                            .font(.subheadline)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("\(item.quantity, specifier: "%.1f") \(item.unit ?? "")")
-                            .font(.caption)
-                            .frame(width: 50, alignment: .center)
-                        Text(item.price, format: .currency(code: "USD"))
-                            .font(.subheadline)
-                            .frame(width: 70, alignment: .trailing)
-                        Text(item.total, format: .currency(code: "USD"))
-                            .font(.subheadline.weight(.medium))
-                            .frame(width: 70, alignment: .trailing)
-                    }
-                    .padding(.vertical, 8)
-                    
-                    if item != invoice.items.last {
-                        Divider()
+                        //                            .font(.caption)
+
+                        HStack {
+                            HStack {
+                                Text("Quantity:")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundColor(.secondary)
+
+                                Text("\(item.quantity, specifier: "%.1f") \(item.unit ?? "")")
+                            }
+
+                            HStack {
+                                Text("Price:")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundColor(.secondary)
+
+                                Text(item.price, format: .currency(code: "USD").presentation(.narrow))
+                            }
+
+                        }
+
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Text("Total:")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundColor(.secondary)
+
+                                Text(item.total, format: .currency(code: "USD").presentation(.narrow))
+                            }
+
+                        }
+
+                        if item != invoice.items.last {
+                            Divider()
+                        }
                     }
                 }
             }
@@ -201,23 +192,23 @@ struct InvoiceView: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
-    
+
     private var summaryCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Summary")
                 .font(.caption.weight(.semibold))
                 .foregroundColor(.secondary)
                 .textCase(.uppercase)
-            
+
             VStack(spacing: 8) {
                 SummaryRow(label: "Subtotal", value: invoice.subtotal)
                 if invoice.discountPercent > 0 {
                     let discountText = String(format: "%.1f", invoice.discountPercent)
-                    SummaryRow(label: "Discount (\(discountText)%)", value: -invoice.discountAmount, valueColor: .green)
+                    SummaryRow(label: "Discount (\(discountText)%)", value: -invoice.discountAmount)
                 }
                 if invoice.taxPercent > 0 {
                     let taxText = String(format: "%.1f", invoice.taxPercent)
-                    SummaryRow(label: "Tax (\(taxText)%)", value: invoice.taxAmount, valueColor: .orange)
+                    SummaryRow(label: "Tax (\(taxText)%)", value: invoice.taxAmount)
                 }
                 Divider()
                 SummaryRow(label: "Grand Total", value: invoice.grandTotal, isTotal: true)
@@ -228,14 +219,14 @@ struct InvoiceView: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
-    
+
     private var notesCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Notes")
                 .font(.caption.weight(.semibold))
                 .foregroundColor(.secondary)
                 .textCase(.uppercase)
-            
+
             Text(invoice.notes)
                 .font(.subheadline)
                 .foregroundColor(.primary)
@@ -246,15 +237,14 @@ struct InvoiceView: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
-    
-    
+
     private var signatureCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Signature")
                 .font(.caption.weight(.semibold))
                 .foregroundColor(.secondary)
                 .textCase(.uppercase)
-            
+
             SignatureCanvas(strokes: .constant(invoice.signatureStrokes), readOnly: true, canvasHeight: 120)
         }
         .padding()
@@ -263,14 +253,13 @@ struct InvoiceView: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
     }
-    
-    
+
     private func generatePDF(preview: Bool) {
         guard let data = InvoicePDFGenerator.generatePDF(for: invoice) else { return }
-        
+
         let tempDir = FileManager.default.temporaryDirectory
         let url = tempDir.appendingPathComponent("\(invoice.clientName)-\(invoice.invoiceNumber).pdf")
-        
+
         do {
             try data.write(to: url)
             pdfTempURL = url
@@ -289,7 +278,7 @@ struct MetaItem: View {
     let label: String
     let value: String
     var valueColor: Color = .primary
-    
+
     var body: some View {
         VStack(spacing: 4) {
             Text(label)
@@ -308,7 +297,7 @@ struct SummaryRow: View {
     let value: Double
     var valueColor: Color = .primary
     var isTotal: Bool = false
-    
+
     var body: some View {
         HStack {
             Text(label)
@@ -323,30 +312,30 @@ struct SummaryRow: View {
 
 struct PDFPreviewView: UIViewControllerRepresentable {
     let url: URL
-    
+
     func makeUIViewController(context: Context) -> QLPreviewController {
         let controller = QLPreviewController()
         controller.dataSource = context.coordinator
         return controller
     }
-    
+
     func updateUIViewController(_ uiViewController: QLPreviewController, context: Context) {}
-    
+
     func makeCoordinator() -> Coordinator {
         Coordinator(url: url)
     }
-    
+
     class Coordinator: NSObject, QLPreviewControllerDataSource {
         let url: URL
-        
+
         init(url: URL) {
             self.url = url
         }
-        
+
         func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
             1
         }
-        
+
         func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
             url as QLPreviewItem
         }
@@ -356,11 +345,11 @@ struct PDFPreviewView: UIViewControllerRepresentable {
 struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
     let applicationActivities: [UIActivity]? = nil
-    
+
     func makeUIViewController(context: Context) -> UIActivityViewController {
         UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
     }
-    
+
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
@@ -372,13 +361,36 @@ struct ShareSheet: UIViewControllerRepresentable {
                 invoiceNumber: "INV-001",
                 clientId: "c1",
                 clientName: "Acme Corp",
+                clientInfo: ClientInfo(
+                    email: "acme@example.com",
+                    phone: "+1 647 555 1212",
+                    address: "123 Yonge eglinton centre",
+                    city: "Toronto",
+                    Country: "Canada"
+                ),
                 items: [
                     InvoiceItem(
-                        description: "Widget",
+                        id: UUID(),
+                        description: "Some not so long description",
                         quantity: 2,
                         unit: "ea",
-                        price: 49.99
-                    )
+                        price: 49000.99
+                    ),
+                    InvoiceItem(
+                        id: UUID(),
+                        description: "Short description",
+                        quantity: 2,
+                        unit: "ea",
+                        price: 499.99
+                    ),
+                    InvoiceItem(
+                        id: UUID(),
+                        description:
+                            "Very very very very very very very very very very very very very very very long description",
+                        quantity: 2,
+                        unit: "ea",
+                        price: 4900000.99
+                    ),
                 ],
                 taxRate: 10,
                 discount: 5,
@@ -390,8 +402,6 @@ struct ShareSheet: UIViewControllerRepresentable {
                 notes: "Net 14",
                 createdAt: Date()
             ),
-            invoices: .constant([]),
-            clients: []
         )
     }.environment(AppRouter())
 }

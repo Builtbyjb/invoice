@@ -8,33 +8,27 @@
 import SwiftUI
 
 struct InvoicesView: View {
+    @Environment(AppCoordinator.self) private var coordinator
+    
     @State private var router: AppRouter
+    @State private var invoices: [Invoice]
     
-    init(router: AppRouter) {
-        _router = State(initialValue: router)
-    }
-    
-    @State private var invoices: [Invoice] = []
-    @State private var clients: [Client] = []
-    @State private var showClientPicker: Bool = false
-    @State private var selectedClientForInvoice: Client? = nil
-    @State private var searchText: String = ""
-    @State private var showSearchBar: Bool = false
 
-    var filteredInvoices: [Invoice] {
-        if searchText.isEmpty { return invoices }
-        return invoices.filter {
-            $0.invoiceNumber.localizedCaseInsensitiveContains(searchText)
-                || $0.clientName.localizedCaseInsensitiveContains(searchText)
-                || $0.status.rawValue.localizedCaseInsensitiveContains(searchText)
-        }
+    init(router: AppRouter, invoices: [Invoice] = []) {
+        _router = State(initialValue: router)
+        _invoices = State(initialValue: invoices)
     }
+
+    @State private var selectedClient: Client? = nil
+    @State private var searchText: String = ""
+    @State private var searchToken: SearchToken? = nil
+    @State private var showSearchBar: Bool = false
 
     var body: some View {
         NavigationStack(path: $router.path) {
             ScrollView {
                 VStack(spacing: 12) {
-                    if filteredInvoices.isEmpty {
+                    if invoices.isEmpty {
                         ContentUnavailableView(
                             "No Invoices",
                             systemImage: "doc.text.magnifyingglass",
@@ -44,7 +38,7 @@ struct InvoicesView: View {
                         )
                         .padding(.top, 40)
                     } else {
-                        ForEach(filteredInvoices) { invoice in
+                        ForEach(invoices) { invoice in
                             NavigationLink(value: invoice) {
                                 InvoiceListCard(invoice: invoice)
                             }
@@ -60,17 +54,21 @@ struct InvoicesView: View {
                 router.switchView(route: route)
             }
             .navigationDestination(for: Invoice.self) { invoice in
-                InvoiceView(invoice: invoice, invoices: $invoices, clients: clients)
+                InvoiceView(invoice: invoice)
             }
-            .navigationDestination(for: InvoiceFormRoute.self) { route in
-                CreateInvoiceView(mode: route, clients: clients, invoices: $invoices)
+            .navigationDestination(for: InvoiceFormMode.self) { route in
+                CreateInvoiceView(mode: route)
             }
-            .navigationDestination(for: ClientFormRoute.self) { route in
-                CreateClientView(mode: route, clients: $clients)
+            .navigationDestination(for: ClientFormMode.self) { route in
+                CreateClientView(mode: route) { savedClient in selectedClient = savedClient }
             }
             .task {
                 do {
-                    invoices = try await Invoice.fetchInvoices()
+                    let response = try await Invoice.fetchInvoices()
+                    if let res = response.data {
+                        invoices = res
+                    } else { invoices = []}
+                    
                 } catch {
                     print(error)
                 }
@@ -78,12 +76,7 @@ struct InvoicesView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .topBarLeading) {
                     Button {
-                        if clients.isEmpty {
-                            router.path.append(ClientFormRoute.create)
-                        } else {
-                            selectedClientForInvoice = clients.first
-                            showClientPicker = true
-                        }
+                        router.path.append(InvoiceFormMode.create)
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -99,28 +92,20 @@ struct InvoicesView: View {
             }
             .safeAreaInset(edge: .bottom) {
                 if showSearchBar {
-                    SearchBarView(
+                    SearchBarView<[Invoice]>(
                         showSearchBar: $showSearchBar,
                         searchText: $searchText,
-                        placeholder: "Search"
-                    )
+                        placeholder: "Search",
+                        token: $searchToken,
+                    ) { result in invoices = result }
                 }
             }
-            .sheet(isPresented: $showClientPicker) {
-                ClientPickerSheet(
-                    clients: clients,
-                    selectedClient: $selectedClientForInvoice,
-                    onContinue: {
-                        showClientPicker = false
-                        if let client = selectedClientForInvoice {
-                            router.path.append(InvoiceFormRoute.create(client))
-                        }
-                    },
-                    onCreateClient: {
-                        showClientPicker = false
-                        router.path.append(ClientFormRoute.create)
-                    }
-                )
+            .onAppear {
+                if let pending = coordinator.pendingInvoiceSearchToken {
+                    searchToken = pending
+                    showSearchBar = true
+                    coordinator.pendingInvoiceSearchToken = nil
+                }
             }
         }.environment(router)
     }
@@ -170,65 +155,8 @@ struct InvoiceListCard: View {
     }
 }
 
-struct ClientPickerSheet: View {
-    let clients: [Client]
-    @Binding var selectedClient: Client?
-    let onContinue: () -> Void
-    let onCreateClient: () -> Void
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section("Select Client") {
-                    Picker("Client", selection: $selectedClient) {
-                        ForEach(clients) { client in
-                            Text(client.name).tag(client as Client?)
-                        }
-                    }
-                    .pickerStyle(.inline)
-                }
-
-                Section {
-                    Button {
-                        onContinue()
-                    } label: {
-                        Image(systemName: "checkmark")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .disabled(selectedClient == nil)
-                }
-
-                Section {
-                    Button {
-                        onCreateClient()
-                    } label: {
-                        HStack {
-                            Image(systemName: "person.badge.plus")
-                            Text("New Client")
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-                }
-            }
-            .navigationTitle("New Invoice")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 17, weight: .semibold))
-                    }
-                }
-            }
-        }
-    }
-}
-
 #Preview {
-    InvoicesView(router: AppRouter())
+    InvoicesView(router: AppRouter(), invoices: [])
+        .environment(AppCoordinator())
         .withPreviewEnvironment()
 }

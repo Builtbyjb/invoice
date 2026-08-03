@@ -11,6 +11,20 @@ struct APIErrorResponse: Codable {
     let message: String
 }
 
+struct PaginationMetadata: Decodable {
+    public var totalCount: Int
+    public var totalPages: Int
+    public var currentPage: Int
+    public var perPage: Int
+    
+}
+
+struct Response<T : Decodable>: Decodable {
+    public var message: String
+    public var data: T?
+    public var meta: PaginationMetadata?
+}
+
 enum APIError: LocalizedError {
     case invalidURL
     case encodingFailed

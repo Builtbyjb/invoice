@@ -8,34 +8,30 @@
 import SwiftUI
 
 struct CreateInvoiceView: View {
-    let mode: InvoiceFormRoute
-    let clients: [Client]
-    @Binding var invoices: [Invoice]
     @Environment(AppRouter.self) var router
+    let mode: InvoiceFormMode
+    @State private var client: Client?
 
-    @State private var selectedClient: Client?
     @State private var status: InvoiceStatus = .draft
     @State private var issueDate: Date = Date()
-    @State private var dueDate: Date = Date().addingTimeInterval(7 * 24 * 60 * 60)
+    @State private var dueDate: Date = Date()
     @State private var items: [InvoiceItem] = []
     @State private var discountPercent: Double = 0
     @State private var taxPercent: Double = 0
     @State private var signatureStrokes: [Stroke] = []
     @State private var notes: String = ""
     @State private var isSaving: Bool = false
+    @State private var showCreateClient: Bool = false
 
-    init(mode: InvoiceFormRoute, clients: [Client], invoices: Binding<[Invoice]>) {
+    init(mode: InvoiceFormMode, client: Client? = nil) {
         self.mode = mode
-        self.clients = clients
-        self._invoices = invoices
+        self.client = client
 
         switch mode {
-        case .create(let client):
-            if let client = client {
-                _selectedClient = State(initialValue: client)
-            }
+        case .create:
+            break
         case .edit(let invoice):
-            _selectedClient = State(initialValue: clients.first(where: { $0.id == invoice.clientId }))
+            _client = State(initialValue: client)
             _status = State(initialValue: invoice.status)
             _issueDate = State(initialValue: invoice.issueDate)
             _dueDate = State(initialValue: invoice.dueDate)
@@ -63,9 +59,7 @@ struct CreateInvoiceView: View {
         subtotal - discountAmount + taxAmount
     }
 
-    var isFormValid: Bool {
-        selectedClient != nil && !items.isEmpty
-    }
+    var isFormValid: Bool { client != nil && !items.isEmpty }
 
     var title: String {
         switch mode {
@@ -81,6 +75,11 @@ struct CreateInvoiceView: View {
             summarySection
             signatureSection
             notesSection
+        }
+        .sheet(isPresented: $showCreateClient) {
+            CreateClientView(mode: .create) { newClient in
+                client = newClient
+            }
         }
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
@@ -111,20 +110,29 @@ struct CreateInvoiceView: View {
 
     private var infoSection: some View {
         Section("Invoice Information") {
-            if selectedClient == nil {
-                Picker("Client", selection: $selectedClient) {
-                    Text("Select a client").tag(nil as Client?)
-                    ForEach(clients) { client in
-                        Text(client.name).tag(client as Client?)
-                    }
+            HStack {
+                Text("Client")
+                Text("*")
+                    .foregroundColor(.red)
+                Button {
+                    showCreateClient = true
+                } label: {
+                    Image(systemName: "plus.circle")
                 }
-            } else {
-                HStack {
-                    Text("Client")
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text(selectedClient?.name ?? "")
-                        .fontWeight(.medium)
+                .buttonStyle(.borderless)
+
+                Spacer()
+
+                SearchDropdownView(
+                    selection: $client,
+                    placeholder: "Search for a client",
+                    titleKeyPath: \.name,
+                    subtitleKeyPath: \.email
+                ) { query in
+                    let response = try await Client.search(query: query)
+                    if let res = response.data {
+                        return res
+                    } else { return [] }
                 }
             }
 
@@ -141,62 +149,61 @@ struct CreateInvoiceView: View {
 
     private var lineItemsSection: some View {
         Section {
-            ForEach($items, id: \.self) { $item in
-                VStack(alignment: .leading, spacing: 8) {
+            ForEach($items) { $item in
+                VStack(alignment: .leading, spacing: 12) {
+
                     TextField("Description", text: $item.description)
 
-                    HStack(spacing: 12) {
-                        HStack(spacing: 4) {
-                            Text("Qty")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            TextField("0", value: $item.quantity, format: .number)
-                                .keyboardType(.decimalPad)
-                                .multilineTextAlignment(.trailing)
-                        }
-                        .frame(maxWidth: .infinity)
+                    HStack(spacing: 4) {
+                        Text("Quantity:")
+                            .foregroundColor(.secondary)
 
-                        HStack(spacing: 4) {
-                            Text("Unit")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            TextField(
-                                "ea",
-                                text: Binding(
-                                    get: { item.unit ?? "" },
-                                    set: { item.unit = $0.isEmpty ? nil : $0 }
-                                )
-                            )
-                            .multilineTextAlignment(.trailing)
-                        }
-                        .frame(maxWidth: .infinity)
-
-                        HStack(spacing: 4) {
-                            Text("Price")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            TextField("0.00", value: $item.price, format: .currency(code: "USD"))
-                                .keyboardType(.decimalPad)
-                                .multilineTextAlignment(.trailing)
-                        }
-                        .frame(maxWidth: .infinity)
+                        TextField("0", value: $item.quantity, format: .number)
+                            .keyboardType(.decimalPad)
                     }
 
-                    HStack {
-                        Spacer()
-                        Text("Total: \(item.total, format: .currency(code: "USD"))")
-                            .font(.caption.weight(.semibold))
+                    HStack(spacing: 4) {
+                        Text("Unit:")
                             .foregroundColor(.secondary)
+                        TextField(
+                            "",
+                            text: Binding(
+                                get: { item.unit ?? "" },
+                                set: { item.unit = $0.isEmpty ? nil : $0 }
+                            )
+                        )
+                    }
+
+                    HStack(spacing: 4) {
+                        Text("Price:")
+                            .foregroundColor(.secondary)
+                        
+                        TextField("0.00", value: $item.price, format: .currency(code: "USD"))
+                            .keyboardType(.decimalPad)
                     }
                 }
-                .padding(.vertical, 4)
+
+                HStack {
+                    Text("Total: \(item.total, format: .currency(code: "USD"))")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Button {
+                        if let index = items.firstIndex(where: { $0.id == item.id }) {
+                            items.remove(at: index)
+                        }
+                    } label: {
+                        Image(systemName: "trash").foregroundColor(.red)
+                    }
+                    .buttonStyle(.borderless)
+                }
             }
             .onDelete { indexSet in
                 items.remove(atOffsets: indexSet)
             }
 
             Button {
-                items.append(InvoiceItem(description: "", quantity: 1, unit: "ea", price: 0))
+                items.append(InvoiceItem(description: "", quantity: 1, unit: "", price: 0))
             } label: {
                 HStack {
                     Image(systemName: "plus.circle")
@@ -204,7 +211,11 @@ struct CreateInvoiceView: View {
                 }
             }
         } header: {
-            Text("Line Items")
+            HStack(spacing: 4) {
+                Text("Line Items")
+                Text("*")
+                    .foregroundColor(.red)
+            }
         }
     }
 
@@ -215,7 +226,6 @@ struct CreateInvoiceView: View {
                     .foregroundColor(.secondary)
                 Spacer()
                 Text(subtotal, format: .currency(code: "USD"))
-                    .fontWeight(.medium)
             }
 
             HStack {
@@ -224,12 +234,9 @@ struct CreateInvoiceView: View {
                         .foregroundColor(.secondary)
                     TextField("0", value: $discountPercent, format: .number)
                         .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.trailing)
                 }
                 Spacer()
                 Text(discountAmount, format: .currency(code: "USD"))
-                    .fontWeight(.medium)
-                    .foregroundColor(.green)
             }
 
             HStack {
@@ -238,12 +245,9 @@ struct CreateInvoiceView: View {
                         .foregroundColor(.secondary)
                     TextField("0", value: $taxPercent, format: .number)
                         .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.trailing)
                 }
                 Spacer()
                 Text(taxAmount, format: .currency(code: "USD"))
-                    .fontWeight(.medium)
-                    .foregroundColor(.orange)
             }
 
             HStack {
@@ -284,7 +288,7 @@ struct CreateInvoiceView: View {
     }
 
     private func save() {
-        guard let client = selectedClient else { return }
+        guard let client = client else { return }
         isSaving = true
 
         Task {
@@ -314,7 +318,7 @@ struct CreateInvoiceView: View {
                         signature: signature
                     )
                     await MainActor.run {
-                        invoices.append(newInvoice)
+                        //                        invoices.append(newInvoice)
                     }
                 case .edit(let existing):
                     let updatedInvoice = try await Invoice.update(
@@ -331,9 +335,9 @@ struct CreateInvoiceView: View {
                         signature: signature
                     )
                     await MainActor.run {
-                        if let index = invoices.firstIndex(where: { $0.id == existing.id }) {
-                            invoices[index] = updatedInvoice
-                        }
+                        //                        if let index = invoices.firstIndex(where: { $0.id == existing.id }) {
+                        //                            invoices[index] = updatedInvoice
+                        //                        }
                     }
                 }
                 await MainActor.run {
@@ -352,23 +356,7 @@ struct CreateInvoiceView: View {
 
 #Preview {
     NavigationStack {
-        CreateInvoiceView(
-            mode: .create(
-                Client(
-                    id: "preview-client",
-                    organizationId: 1,
-                    name: "Preview Client",
-                    email: "preview@example.com",
-                    phone: "555-0000",
-                    address: "123 Preview St",
-                    city: "Preview City",
-                    country: "Previewland",
-                    createdAt: "2026-07-10"
-                )
-            ),
-            clients: [],
-            invoices: .constant([])
-        )
-        .environment(AppRouter())
+        CreateInvoiceView(mode: .create)
+            .environment(AppRouter())
     }
 }

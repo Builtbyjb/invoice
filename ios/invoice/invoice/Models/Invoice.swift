@@ -41,7 +41,8 @@ struct Stroke: Codable {
     let points: [CGPointWrapper]
 }
 
-struct InvoiceItem: Equatable, Hashable, Codable {
+struct InvoiceItem: Equatable, Hashable, Identifiable, Codable {
+    var id: UUID = UUID()
     var description: String
     var quantity: Double
     var unit: String? = nil
@@ -50,6 +51,31 @@ struct InvoiceItem: Equatable, Hashable, Codable {
     var total: Double {
         quantity * price
     }
+
+    enum CodingKeys: String, CodingKey {
+        case description, quantity, unit, price
+    }
+}
+
+private struct InvoiceRequest: Codable {
+    let clientId: String
+    let status: InvoiceStatus
+    let issueDate: Date
+    let dueDate: Date
+    let items: [InvoiceItem]
+    let taxRate: Double
+    let discount: Double
+    let currency: String
+    let notes: String
+    let signature: String?
+}
+
+struct ClientInfo: Equatable, Hashable, Codable {
+    let email: String
+    let phone: String
+    let address: String
+    let city: String
+    let Country: String
 }
 
 struct Invoice: Equatable, Hashable, Identifiable, Codable {
@@ -57,6 +83,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
     public var invoiceNumber: String
     public var clientId: String
     public var clientName: String
+    public var clientInfo: ClientInfo
     public var items: [InvoiceItem]
     public var taxRate: Double
     public var discount: Double
@@ -119,7 +146,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
         return formatter
     }()
 
-    static func fetchInvoices() async throws -> [Invoice] {
+    static func fetchInvoices() async throws -> Response<[Invoice]> {
         return try await APIClient.shared.request(
             path: "/api/v1/invoices",
             method: "GET",
@@ -127,9 +154,9 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
         )
     }
 
-    static func fetchClientInvoices(clientId: String) async throws -> [Invoice] {
+    static func fetchClientInvoices(clientId: String) async throws -> Response<[Invoice]> {
         return try await APIClient.shared.request(
-            path: "/api/v1/clients/\(clientId)/invoices",
+            path: "/api/v1/invoices",
             method: "GET",
             requiresAuth: true
         )
@@ -146,7 +173,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
         currency: String,
         notes: String,
         signature: String?
-    ) async throws -> Invoice {
+    ) async throws -> Response<Invoice> {
         let body = InvoiceRequest(
             clientId: clientId,
             status: status,
@@ -179,7 +206,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
         currency: String,
         notes: String,
         signature: String?
-    ) async throws -> Invoice {
+    ) async throws -> Response<Invoice> {
         let body = InvoiceRequest(
             clientId: clientId,
             status: status,
@@ -200,10 +227,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
         )
     }
     
-    static func fetch(id: String) async throws -> Invoice {
-        #if DEBUG
-        if DemoData.invoice.id == id { return DemoData.invoice }
-        #endif
+    static func fetch(id: String) async throws -> Response<Invoice> {
         return try await APIClient.shared.request(
             path: "/api/v1/invoices/\(id)",
             method: "GET",
@@ -212,15 +236,3 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
     }
 }
 
-private struct InvoiceRequest: Codable {
-    let clientId: String
-    let status: InvoiceStatus
-    let issueDate: Date
-    let dueDate: Date
-    let items: [InvoiceItem]
-    let taxRate: Double
-    let discount: Double
-    let currency: String
-    let notes: String
-    let signature: String?
-}

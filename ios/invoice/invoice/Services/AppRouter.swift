@@ -18,13 +18,13 @@ enum AppRoute: Hashable {
     case subscriptions
 }
 
-enum ClientFormRoute: Hashable {
+enum ClientFormMode: Hashable {
     case create
     case edit(Client)
 }
 
-enum InvoiceFormRoute: Hashable {
-    case create(Client?)
+enum InvoiceFormMode: Hashable {
+    case create
     case edit(Invoice)
 }
 
@@ -66,12 +66,16 @@ final class AppRouter {
     }
     
     @ViewBuilder
-    func switchToClientView(client: Client, clients: Binding<[Client]>) -> some View {
-        ClientView(client: client, clients: clients)
+    func switchToClientView(client: Client) -> some View {
+        ClientView(client: client)
     }
     
     @ViewBuilder
-    func switchToClientCreateView(mode: ClientFormRoute, clients: Binding<[Client]>) -> some View {
-        CreateClientView(mode: mode, clients: clients)
+    func switchToClientCreateView(
+        mode: ClientFormMode,
+        onSave: ((Client) -> Void)? = nil
+    ) -> some View {
+        CreateClientView(mode: mode, onSave: onSave)
     }
+    
 }
