@@ -178,11 +178,11 @@ struct InvoicePDFGenerator {
             ]
         )
 
-        let bodyFont = UIFont.systemFont(ofSize: 12, weight: .regular)
-        let boldFont = UIFont.systemFont(ofSize: 13, weight: .bold)
+//        let bodyFont = UIFont.systemFont(ofSize: 12, weight: .regular)
+//        let boldFont = UIFont.systemFont(ofSize: 13, weight: .bold)
 
         //        let client = invoice.client
-        var lines: [(String, UIFont)] = [
+        let lines: [(String, UIFont)] = [
             //            (client.name, boldFont),
             //            (client.email, bodyFont),
             //            (client.phone, bodyFont),
@@ -292,7 +292,7 @@ struct InvoicePDFGenerator {
                 width: colWidths[2] - 6,
                 height: rowHeight
             )
-            (item.unit ?? "").draw(in: unitRect, withAttributes: numberAttributes)
+            (item.unit).draw(in: unitRect, withAttributes: numberAttributes)
 
             let priceRect = CGRect(
                 x: tableX + colWidths[0] + colWidths[1] + colWidths[2],

@@ -10,9 +10,11 @@ import SwiftUI
 struct CreateInvoiceView: View {
     @Environment(AppRouter.self) var router
     let mode: InvoiceFormMode
-    @State private var client: Client?
+    @State private var client: Client? = nil
 
+    @State private var clientName: String = ""
     @State private var status: InvoiceStatus = .draft
+    @State private var currency: String = "USD"
     @State private var issueDate: Date = Date()
     @State private var dueDate: Date = Date()
     @State private var items: [InvoiceItem] = []
@@ -20,19 +22,25 @@ struct CreateInvoiceView: View {
     @State private var taxPercent: Double = 0
     @State private var signatureStrokes: [Stroke] = []
     @State private var notes: String = ""
+    
+    @State private var discountText: String = ""
+    @State private var taxText: String = ""
+
     @State private var isSaving: Bool = false
     @State private var showCreateClient: Bool = false
+    @State private var showClientSelect: Bool = false
 
-    init(mode: InvoiceFormMode, client: Client? = nil) {
+    init(mode: InvoiceFormMode) {
         self.mode = mode
-        self.client = client
 
         switch mode {
         case .create:
+            _showClientSelect = State(initialValue: true)
             break
         case .edit(let invoice):
-            _client = State(initialValue: client)
+            _clientName = State(initialValue: invoice.clientName)
             _status = State(initialValue: invoice.status)
+            _currency = State(initialValue: invoice.currency)
             _issueDate = State(initialValue: invoice.issueDate)
             _dueDate = State(initialValue: invoice.dueDate)
             _items = State(initialValue: invoice.items)
@@ -59,7 +67,9 @@ struct CreateInvoiceView: View {
         subtotal - discountAmount + taxAmount
     }
 
-    var isFormValid: Bool { client != nil && !items.isEmpty }
+    var isFormValid: Bool {
+        (client != nil || !clientName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) && !items.isEmpty
+    }
 
     var title: String {
         switch mode {
@@ -114,6 +124,7 @@ struct CreateInvoiceView: View {
                 Text("Client")
                 Text("*")
                     .foregroundColor(.red)
+
                 Button {
                     showCreateClient = true
                 } label: {
@@ -123,17 +134,35 @@ struct CreateInvoiceView: View {
 
                 Spacer()
 
-                SearchDropdownView(
-                    selection: $client,
-                    placeholder: "Search for a client",
-                    titleKeyPath: \.name,
-                    subtitleKeyPath: \.email
-                ) { query in
-                    let response = try await Client.search(query: query)
-                    if let res = response.data {
-                        return res
-                    } else { return [] }
+                if showClientSelect {
+                    SearchDropdownView(
+                        selection: $client,
+                        placeholder: "Search for a client by name",
+                        titleKeyPath: \.name,
+                        subtitleKeyPath: \.email
+                    ) { query in
+                        // Search closure executed by SearchDropdownView search() to fetch clients
+                        let response = try await Client.searchByName(name: query)
+                        if let res = response.data {
+                            return res
+                        } else {
+                            return []
+                        }
+                    }
+                } else {
+                    HStack(spacing: 6) {
+                        Text(clientName)
+
+                        Button {
+                            showClientSelect = true
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.borderless)
+                    }
                 }
+
             }
 
             Picker("Status", selection: $status) {
@@ -142,8 +171,14 @@ struct CreateInvoiceView: View {
                 }
             }
 
-            DatePicker("Issue Date", selection: $issueDate, displayedComponents: .date)
-            DatePicker("Due Date", selection: $dueDate, displayedComponents: .date)
+            Picker("Currency", selection: $currency) {
+                ForEach(currencies, id: \.self) { currency in
+                    Text(currency)
+                }
+            }
+
+            DatePicker("Issue Date", selection: $issueDate, displayedComponents: .date).datePickerStyle(.compact)
+            DatePicker("Due Date", selection: $dueDate, displayedComponents: .date).datePickerStyle(.compact)
         }
     }
 
@@ -151,43 +186,36 @@ struct CreateInvoiceView: View {
         Section {
             ForEach($items) { $item in
                 VStack(alignment: .leading, spacing: 12) {
-
                     TextField("Description", text: $item.description)
 
                     HStack(spacing: 4) {
                         Text("Quantity:")
                             .foregroundColor(.secondary)
 
-                        TextField("0", value: $item.quantity, format: .number)
+                        TextField("0.00", value: $item.quantity, format: .number)
                             .keyboardType(.decimalPad)
                     }
 
                     HStack(spacing: 4) {
                         Text("Unit:")
                             .foregroundColor(.secondary)
-                        TextField(
-                            "",
-                            text: Binding(
-                                get: { item.unit ?? "" },
-                                set: { item.unit = $0.isEmpty ? nil : $0 }
-                            )
-                        )
+                        TextField("", text: $item.unit)
                     }
 
                     HStack(spacing: 4) {
                         Text("Price:")
                             .foregroundColor(.secondary)
-                        
-                        TextField("0.00", value: $item.price, format: .currency(code: "USD"))
+
+                        TextField("0.00", value: $item.price, format: .number)
                             .keyboardType(.decimalPad)
                     }
                 }
 
                 HStack {
-                    Text("Total: \(item.total, format: .currency(code: "USD"))")
+                    Text("Total: \(item.total, format: .currency(code: currency).presentation(.narrow))")
                         .font(.headline)
-                        .foregroundColor(.secondary)
                     Spacer()
+                    // Line item delete button
                     Button {
                         if let index = items.firstIndex(where: { $0.id == item.id }) {
                             items.remove(at: index)
@@ -197,9 +225,6 @@ struct CreateInvoiceView: View {
                     }
                     .buttonStyle(.borderless)
                 }
-            }
-            .onDelete { indexSet in
-                items.remove(atOffsets: indexSet)
             }
 
             Button {
@@ -225,36 +250,42 @@ struct CreateInvoiceView: View {
                 Text("Subtotal")
                     .foregroundColor(.secondary)
                 Spacer()
-                Text(subtotal, format: .currency(code: "USD"))
+                Text(subtotal, format: .currency(code: currency).presentation(.narrow))
             }
 
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Discount")
+                    Text("Discount (%)")
                         .foregroundColor(.secondary)
-                    TextField("0", value: $discountPercent, format: .number)
+                    TextField("0", text: $discountText)
                         .keyboardType(.decimalPad)
+                        .onChange(of: discountText) { _, newValue in
+                            discountPercent = Double(newValue) ?? 0
+                        }
                 }
                 Spacer()
-                Text(discountAmount, format: .currency(code: "USD"))
+                Text(discountAmount, format: .currency(code: currency).presentation(.narrow))
             }
 
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Tax")
+                    Text("Tax (%)")
                         .foregroundColor(.secondary)
-                    TextField("0", value: $taxPercent, format: .number)
+                    TextField("0", text: $taxText)
                         .keyboardType(.decimalPad)
+                        .onChange(of: taxText) { _, newValue in
+                            taxPercent = Double(newValue) ?? 0
+                        }
                 }
                 Spacer()
-                Text(taxAmount, format: .currency(code: "USD"))
+                Text(taxAmount, format: .currency(code: currency).presentation(.narrow))
             }
 
             HStack {
                 Text("Grand Total")
                     .font(.headline)
                 Spacer()
-                Text(grandTotal, format: .currency(code: "USD"))
+                Text(grandTotal, format: .currency(code: currency).presentation(.narrow))
                     .font(.headline)
             }
         } header: {
@@ -287,8 +318,15 @@ struct CreateInvoiceView: View {
         }
     }
 
+    private static func decimalText(_ value: Double) -> String {
+        guard value != 0 else { return "" }
+        if value == value.rounded() && abs(value) < 1e15 {
+            return String(Int(value))
+        }
+        return String(value)
+    }
+
     private func save() {
-        guard let client = client else { return }
         isSaving = true
 
         Task {
@@ -305,15 +343,17 @@ struct CreateInvoiceView: View {
 
                 switch mode {
                 case .create:
-                    let newInvoice = try await Invoice.create(
-                        clientId: client.id,
+                    guard let client = client else { return }
+
+                    let _ = try await Invoice.create(
+                        clientID: client.id,
                         status: status,
                         issueDate: issueDate,
                         dueDate: dueDate,
                         items: items,
                         taxRate: taxPercent,
                         discount: discountPercent,
-                        currency: "USD",
+                        currency: currency,
                         notes: notes,
                         signature: signature
                     )
@@ -321,28 +361,27 @@ struct CreateInvoiceView: View {
                         //                        invoices.append(newInvoice)
                     }
                 case .edit(let existing):
-                    let updatedInvoice = try await Invoice.update(
+                    let response = try await Invoice.update(
                         id: existing.id,
-                        clientId: client.id,
+                        clientID: existing.clientID,
                         status: status,
                         issueDate: issueDate,
                         dueDate: dueDate,
                         items: items,
                         taxRate: taxPercent,
                         discount: discountPercent,
-                        currency: "USD",
+                        currency: currency,
                         notes: notes,
                         signature: signature
                     )
+
                     await MainActor.run {
-                        //                        if let index = invoices.firstIndex(where: { $0.id == existing.id }) {
-                        //                            invoices[index] = updatedInvoice
-                        //                        }
+                        if let res = response.data {
+                            isSaving = false
+                            router.popToRoot()
+                            router.path.append(res)
+                        }
                     }
-                }
-                await MainActor.run {
-                    isSaving = false
-                    router.pop()
                 }
             } catch {
                 await MainActor.run {

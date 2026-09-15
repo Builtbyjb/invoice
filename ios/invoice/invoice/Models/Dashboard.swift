@@ -34,16 +34,17 @@ struct Dashboard: Codable, Equatable, Hashable {
             requiresAuth: true
         )
     }
-    
+
     static func fetchMonthlyRevenue(year: String?, currency: String) async throws -> [MonthlyRevenue] {
-        var queryItems: [URLQueryItem] = [
-            URLQueryItem(name: "currency", value: currency)
-        ]
+        var queryItems: [URLQueryItem] = [URLQueryItem(name: "currency", value: currency)]
+
         if let year = year, !year.isEmpty {
             queryItems.append(URLQueryItem(name: "year", value: year))
         }
+
         return try await APIClient.shared.request(
-            path: "/api/v1/user/dashboard/revenues?year=2026&currency=usd",
+            path: "/api/v1/user/dashboard/revenues",
+            queryItems: queryItems,
             method: "GET",
             requiresAuth: true
         )

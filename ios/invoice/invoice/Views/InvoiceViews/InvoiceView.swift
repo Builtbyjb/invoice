@@ -36,33 +36,33 @@ struct InvoiceView: View {
         .navigationTitle(invoice.invoiceNumber)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                ControlGroup {
-                    Button {
-                        router.path.append(InvoiceFormMode.edit(invoice))
-                    } label: {
-                        Image(systemName: "square.and.pencil")
-                    }
-
-                    // PDF Preview
-                    Button {
-                        generatePDF(preview: true)
-                    } label: {
-                        Image(systemName: "eye")
-                    }
-
-                    //  PDF Download
-                    Button {
-                        generatePDF(preview: false)
-                    } label: {
-                        Image(systemName: "square.and.arrow.down")
-                    }
-
-                    Button {
-                        print("Delete invoice")
-                    } label: {
-                        Image(systemName: "trash")
-                    }.foregroundColor(.red)
+                Button {
+                    generatePDF(preview: true)
+                } label: {
+                    Image(systemName: "eye.circle")
                 }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    generatePDF(preview: false)
+                } label: {
+                    Image(systemName: "square.and.arrow.down")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    router.path.append(InvoiceFormMode.edit(invoice))
+                } label: {
+                    Image(systemName: "square.and.pencil")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    print("Delete invoice")
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .foregroundColor(.red)
             }
         }
         .sheet(isPresented: $showPDFPreview) {
@@ -98,7 +98,7 @@ struct InvoiceView: View {
                 Text(invoice.clientInfo.city)
                     .font(.caption)
                     .foregroundColor(.secondary)
-                Text(invoice.clientInfo.Country)
+                Text(invoice.clientInfo.country)
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -111,8 +111,10 @@ struct InvoiceView: View {
     }
 
     private var metaInfoCard: some View {
-        HStack {
+        HStack(spacing: 2) {
             MetaItem(label: "Status", value: invoice.status.rawValue, valueColor: statusColor)
+            Divider()
+            MetaItem(label: "Currency", value: invoice.currency)
             Divider()
             MetaItem(label: "Issue Date", value: invoice.issueDate.formatted(date: .abbreviated, time: .omitted))
             Divider()
@@ -148,7 +150,6 @@ struct InvoiceView: View {
                             .foregroundColor(.secondary)
 
                         Text(item.description)
-                        //                            .font(.caption)
 
                         HStack {
                             HStack {
@@ -156,7 +157,7 @@ struct InvoiceView: View {
                                     .font(.caption.weight(.semibold))
                                     .foregroundColor(.secondary)
 
-                                Text("\(item.quantity, specifier: "%.1f") \(item.unit ?? "")")
+                                Text("\(item.quantity, specifier: "%.1f") \(item.unit)")
                             }
 
                             HStack {
@@ -164,7 +165,7 @@ struct InvoiceView: View {
                                     .font(.caption.weight(.semibold))
                                     .foregroundColor(.secondary)
 
-                                Text(item.price, format: .currency(code: "USD").presentation(.narrow))
+                                Text(item.price, format: .currency(code: invoice.currency).presentation(.narrow))
                             }
 
                         }
@@ -175,7 +176,7 @@ struct InvoiceView: View {
                                     .font(.caption.weight(.semibold))
                                     .foregroundColor(.secondary)
 
-                                Text(item.total, format: .currency(code: "USD").presentation(.narrow))
+                                Text(item.total, format: .currency(code: invoice.currency).presentation(.narrow))
                             }
 
                         }
@@ -188,6 +189,7 @@ struct InvoiceView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.04), radius: 4, x: 0, y: 2)
@@ -201,17 +203,21 @@ struct InvoiceView: View {
                 .textCase(.uppercase)
 
             VStack(spacing: 8) {
-                SummaryRow(label: "Subtotal", value: invoice.subtotal)
+                SummaryRow(label: "Subtotal", value: invoice.subtotal, currency: invoice.currency)
                 if invoice.discountPercent > 0 {
                     let discountText = String(format: "%.1f", invoice.discountPercent)
-                    SummaryRow(label: "Discount (\(discountText)%)", value: -invoice.discountAmount)
+                    SummaryRow(
+                        label: "Discount (\(discountText)%)",
+                        value: -invoice.discountAmount,
+                        currency: invoice.currency
+                    )
                 }
                 if invoice.taxPercent > 0 {
                     let taxText = String(format: "%.1f", invoice.taxPercent)
-                    SummaryRow(label: "Tax (\(taxText)%)", value: invoice.taxAmount)
+                    SummaryRow(label: "Tax (\(taxText)%)", value: invoice.taxAmount, currency: invoice.currency)
                 }
                 Divider()
-                SummaryRow(label: "Grand Total", value: invoice.grandTotal, isTotal: true)
+                SummaryRow(label: "Grand Total", value: invoice.grandTotal, currency: invoice.currency, isTotal: true)
             }
         }
         .padding()
@@ -285,7 +291,7 @@ struct MetaItem: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
             Text(value)
-                .font(.subheadline.weight(.medium))
+                .font(.caption)
                 .foregroundColor(valueColor)
         }
         .frame(maxWidth: .infinity)
@@ -295,6 +301,7 @@ struct MetaItem: View {
 struct SummaryRow: View {
     let label: String
     let value: Double
+    let currency: String
     var valueColor: Color = .primary
     var isTotal: Bool = false
 
@@ -303,7 +310,7 @@ struct SummaryRow: View {
             Text(label)
                 .font(isTotal ? .headline : .subheadline)
             Spacer()
-            Text(value, format: .currency(code: "USD"))
+            Text(value, format: .currency(code: currency).presentation(.narrow))
                 .font(isTotal ? .headline.weight(.bold) : .subheadline)
                 .foregroundColor(valueColor)
         }
@@ -359,14 +366,14 @@ struct ShareSheet: UIViewControllerRepresentable {
             invoice: Invoice(
                 id: "1",
                 invoiceNumber: "INV-001",
-                clientId: "c1",
+                clientID: "c1",
                 clientName: "Acme Corp",
                 clientInfo: ClientInfo(
                     email: "acme@example.com",
                     phone: "+1 647 555 1212",
                     address: "123 Yonge eglinton centre",
                     city: "Toronto",
-                    Country: "Canada"
+                    country: "Canada"
                 ),
                 items: [
                     InvoiceItem(

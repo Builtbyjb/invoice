@@ -24,7 +24,6 @@ struct SignUpView: View {
     @State private var errorMessage = ""
     @State private var showValidateOTP: Bool = false
     @State private var otpEmail: String = ""
-    @State private var otpTempToken: String = ""
 
     var body: some View {
         ScrollView {
@@ -113,8 +112,9 @@ struct SignUpView: View {
                         country: selectedCountry
                     )
                     let response = try await Auth.signUp(signUpDetails: signUpDetails)
+                    try TokenStore.shared.save(Token(accessToken: response.accessToken, refreshToken: ""))
+                    
                     otpEmail = email
-                    otpTempToken = response.accessToken
                     showValidateOTP = true
                 } catch {
                     errorMessage = error.localizedDescription

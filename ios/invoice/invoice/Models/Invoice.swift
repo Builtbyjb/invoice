@@ -17,19 +17,19 @@ public enum InvoiceStatus: String, Equatable, Hashable, CaseIterable, Codable {
 struct CGPointWrapper: Codable {
     let point: CGPoint
     init(_ point: CGPoint) { self.point = point }
-    
+
     enum CodingKeys: String, CodingKey {
         case x
         case y
     }
-    
+
     init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let x = try container.decode(Double.self, forKey: .x)
         let y = try container.decode(Double.self, forKey: .y)
         self.init(CGPoint(x: x, y: y))
     }
-    
+
     func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(point.x, forKey: .x)
@@ -45,20 +45,28 @@ struct InvoiceItem: Equatable, Hashable, Identifiable, Codable {
     var id: UUID = UUID()
     var description: String
     var quantity: Double
-    var unit: String? = nil
+    var unit: String
     var price: Double
+
+    init(id: UUID = UUID(), description: String, quantity: Double, unit: String, price: Double) {
+        self.id = id
+        self.description = description
+        self.quantity = quantity
+        self.unit = unit
+        self.price = price
+    }
 
     var total: Double {
         quantity * price
     }
 
     enum CodingKeys: String, CodingKey {
-        case description, quantity, unit, price
+        case id, description, quantity, unit, price
     }
 }
 
 private struct InvoiceRequest: Codable {
-    let clientId: String
+    let clientID: String
     let status: InvoiceStatus
     let issueDate: Date
     let dueDate: Date
@@ -70,18 +78,22 @@ private struct InvoiceRequest: Codable {
     let signature: String?
 }
 
-struct ClientInfo: Equatable, Hashable, Codable {
+struct ClientInfo: Equatable, Hashable, Decodable {
     let email: String
     let phone: String
     let address: String
     let city: String
-    let Country: String
+    let country: String
+
+    enum CodingKeys: String, CodingKey {
+        case email, phone, address, city, country
+    }
 }
 
-struct Invoice: Equatable, Hashable, Identifiable, Codable {
+struct Invoice: Equatable, Hashable, Identifiable, Decodable {
     public var id: String
     public var invoiceNumber: String
-    public var clientId: String
+    public var clientID: String
     public var clientName: String
     public var clientInfo: ClientInfo
     public var items: [InvoiceItem]
@@ -163,7 +175,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
     }
 
     static func create(
-        clientId: String,
+        clientID: String,
         status: InvoiceStatus,
         issueDate: Date,
         dueDate: Date,
@@ -175,7 +187,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
         signature: String?
     ) async throws -> Response<Invoice> {
         let body = InvoiceRequest(
-            clientId: clientId,
+            clientID: clientID,
             status: status,
             issueDate: issueDate,
             dueDate: dueDate,
@@ -187,7 +199,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
             signature: signature
         )
         return try await APIClient.shared.request(
-            path: "/api/v1/invoices",
+            path: "/api/v1/invoices/create",
             method: "POST",
             body: body,
             requiresAuth: true
@@ -196,7 +208,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
 
     static func update(
         id: String,
-        clientId: String,
+        clientID: String,
         status: InvoiceStatus,
         issueDate: Date,
         dueDate: Date,
@@ -208,7 +220,7 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
         signature: String?
     ) async throws -> Response<Invoice> {
         let body = InvoiceRequest(
-            clientId: clientId,
+            clientID: clientID,
             status: status,
             issueDate: issueDate,
             dueDate: dueDate,
@@ -220,13 +232,13 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
             signature: signature
         )
         return try await APIClient.shared.request(
-            path: "/api/v1/invoices/\(id)",
+            path: "/api/v1/invoices/\(id)/edit",
             method: "PUT",
             body: body,
             requiresAuth: true
         )
     }
-    
+
     static func fetch(id: String) async throws -> Response<Invoice> {
         return try await APIClient.shared.request(
             path: "/api/v1/invoices/\(id)",
@@ -234,5 +246,12 @@ struct Invoice: Equatable, Hashable, Identifiable, Codable {
             requiresAuth: true
         )
     }
-}
 
+    static func delete(id: String) async throws -> Response<Invoice> {
+        return try await APIClient.shared.request(
+            path: "/api/v1/invoices/\(id)/delete",
+            method: "DELETE",
+            requiresAuth: true
+        )
+    }
+}

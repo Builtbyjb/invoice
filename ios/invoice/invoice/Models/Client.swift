@@ -19,7 +19,7 @@ private struct ClientRequest: Encodable {
 
 public struct Client: Equatable, Hashable, Identifiable, Codable {
     public var id: String
-    public var organizationId: UInt64
+    public var organizationID: UInt64
     public var name: String
     public var email: String
     public var phone: String
@@ -42,7 +42,7 @@ public struct Client: Equatable, Hashable, Identifiable, Codable {
         createdAt: String
     ) {
         self.id = id
-        self.organizationId = organizationId
+        self.organizationID = organizationId
         self.name = name
         self.email = email
         self.phone = phone
@@ -61,10 +61,10 @@ public struct Client: Equatable, Hashable, Identifiable, Codable {
         )
     }
 
-    static func search(query: String) async throws -> Response<[Client]> {
-        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
+    static func searchByName(name: String) async throws -> Response<[Client]> {
         return try await APIClient.shared.request(
-            path: "/api/v1/clients?search=\(encoded)",
+            path: "/api/v1/clients",
+            queryItems: [URLQueryItem(name: "name", value: name)],
             method: "GET",
             requiresAuth: true
         )
@@ -130,7 +130,7 @@ public struct Client: Equatable, Hashable, Identifiable, Codable {
             requiresAuth: true
         )
     }
-    
+
     static func delete(id: String) async throws -> Response<Client> {
         return try await APIClient.shared.request(
             path: "/api/v1/clients/\(id)/delete",

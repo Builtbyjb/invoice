@@ -7,25 +7,25 @@
 
 import SwiftUI
 
-struct SearchDropdownView<Item: Identifiable>: View {
-    @Binding var selection: Item?
+struct SearchDropdownView<T: Identifiable>: View {
+    @Binding var selection: T?
     let placeholder: String
-    let titleKeyPath: KeyPath<Item, String>
-    let subtitleKeyPath: KeyPath<Item, String>?
-    let search: (String) async throws -> [Item]
+    let titleKeyPath: KeyPath<T, String>
+    let subtitleKeyPath: KeyPath<T, String>?
+    let search: (String) async throws -> [T]
 
     @State private var query: String = ""
-    @State private var results: [Item] = []
+    @State private var results: [T] = []
     @State private var isLoading: Bool = false
     @State private var searchTask: Task<Void, Never>?
     @FocusState private var searchFocused: Bool
 
     init(
-        selection: Binding<Item?>,
+        selection: Binding<T?>,
         placeholder: String,
-        titleKeyPath: KeyPath<Item, String>,
-        subtitleKeyPath: KeyPath<Item, String>? = nil,
-        search: @escaping (String) async throws -> [Item]
+        titleKeyPath: KeyPath<T, String>,
+        subtitleKeyPath: KeyPath<T, String>? = nil,
+        search: @escaping (String) async throws -> [T]
     ) {
         self._selection = selection
         self.placeholder = placeholder
@@ -113,6 +113,7 @@ struct SearchDropdownView<Item: Identifiable>: View {
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
                                 .contentShape(Rectangle())
+                                .cornerRadius(0)
                             }
                             .buttonStyle(.plain)
                         }
@@ -124,7 +125,7 @@ struct SearchDropdownView<Item: Identifiable>: View {
         .frame(width: 280)
     }
 
-    private func select(_ item: Item) {
+    private func select(_ item: T) {
         searchTask?.cancel()
         selection = item
         searchFocused = false

@@ -25,7 +25,7 @@ enum DeepLink: Equatable {
 final class AppCoordinator {
     var selectedTab: AppTab = .home
 
-    /// One-shot filter handed to InvoicesView when switching tabs from a client detail.
+    // One-shot filter handed to InvoicesView when switching tabs from a client detail.
     var pendingInvoiceSearchToken: SearchToken? = nil
     
     let homeRouter = AppRouter()

@@ -88,13 +88,25 @@ final class APIClient {
 
     func request<T: Decodable>(
         path: String,
+        queryItems: [URLQueryItem]? = nil,
         method: String,
         body: Encodable? = nil,
         requiresAuth: Bool = false,
     ) async throws -> T {
         // Get base URL
         let baseURL = ENV.current.baseURL.appendingPathComponent(path)
-        guard let url = URL(string: baseURL.absoluteString) else { throw APIError.invalidURL }
+        
+        guard var components = URLComponents(
+             url: baseURL,
+             resolvingAgainstBaseURL: false
+         ) else {
+             throw URLError(.badURL)
+         }
+         components.queryItems = queryItems
+
+         guard let url = components.url else {
+             throw URLError(.badURL)
+         }
 
         var request = URLRequest(url: url)
         request.httpMethod = method
@@ -109,7 +121,11 @@ final class APIClient {
             request.setValue("Bearer \(token.accessToken)", forHTTPHeaderField: "Authorization")
         }
 
-        if let body = body { request.httpBody = try JSONEncoder().encode(body) }
+        if let body = body {
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            request.httpBody = try encoder.encode(body)
+        }
 
         let (data, httpResponse) = try await performRequest(request)
 
@@ -156,7 +172,9 @@ final class APIClient {
         switch statusCode {
         case 200...299:
             do {
-                return try JSONDecoder().decode(T.self, from: data)
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .iso8601
+                return try decoder.decode(T.self, from: data)
             } catch {
                 throw APIError.decodingFailed
             }

@@ -67,14 +67,14 @@ enum DemoData {
     static let invoice = Invoice(
         id: invoiceID,
         invoiceNumber: "INV-001",
-        clientId: clientID,
+        clientID: clientID,
         clientName: client.name,
         clientInfo: ClientInfo(
             email: client.email,
             phone: client.phone,
             address: client.address,
             city: client.city,
-            Country: client.country
+            country: client.country
         ),
         items: [
             InvoiceItem(description: "Consulting", quantity: 10, unit: "hr", price: 150)

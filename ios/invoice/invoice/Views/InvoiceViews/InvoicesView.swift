@@ -9,10 +9,9 @@ import SwiftUI
 
 struct InvoicesView: View {
     @Environment(AppCoordinator.self) private var coordinator
-    
+
     @State private var router: AppRouter
     @State private var invoices: [Invoice]
-    
 
     init(router: AppRouter, invoices: [Invoice] = []) {
         _router = State(initialValue: router)
@@ -67,8 +66,10 @@ struct InvoicesView: View {
                     let response = try await Invoice.fetchInvoices()
                     if let res = response.data {
                         invoices = res
-                    } else { invoices = []}
-                    
+                    } else {
+                        invoices = []
+                    }
+
                 } catch {
                     print(error)
                 }
@@ -125,7 +126,7 @@ struct InvoiceListCard: View {
                     .foregroundColor(.secondary)
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("\(invoice.grandTotal, format: .currency(code: "USD"))")
+                    Text("\(invoice.grandTotal, format: .currency(code: invoice.currency).presentation(.narrow))")
                         .font(.headline)
 
                     Text("Due \(invoice.dueDate, style: .date)")
