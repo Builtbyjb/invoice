@@ -1,0 +1,57 @@
+import type Ionicons from '@expo/vector-icons/Ionicons';
+import type { ComponentProps } from 'react';
+
+export type IoniconName = ComponentProps<typeof Ionicons>['name'];
+
+/** SF Symbol → Ionicons fallback, used on platforms without SF Symbols. */
+export const SF_FALLBACKS = {
+  house: 'home-outline',
+  'house.fill': 'home',
+  person: 'person-outline',
+  'person.fill': 'person',
+  'doc.text': 'document-text-outline',
+  'doc.text.fill': 'document-text',
+  gift: 'gift-outline',
+  'gift.fill': 'gift',
+  'questionmark.circle': 'help-circle-outline',
+  bell: 'notifications-outline',
+  'bell.fill': 'notifications',
+  gear: 'settings-outline',
+  plus: 'add',
+  magnifyingglass: 'search',
+  xmark: 'close',
+  'xmark.circle.fill': 'close-circle',
+  'chevron.right': 'chevron-forward',
+  'chevron.down': 'chevron-down',
+  checkmark: 'checkmark',
+  'checkmark.circle': 'checkmark-circle-outline',
+  'checkmark.circle.fill': 'checkmark-circle',
+  'exclamationmark.triangle.fill': 'warning',
+  envelope: 'mail-outline',
+  'envelope.fill': 'mail',
+  phone: 'call-outline',
+  'phone.fill': 'call',
+  'building.2': 'business-outline',
+  'building.2.fill': 'business',
+  globe: 'globe-outline',
+  'text.document': 'reader-outline',
+  'square.and.pencil': 'create-outline',
+  trash: 'trash-outline',
+  'document.badge.ellipsis': 'documents-outline',
+  'eye.circle': 'eye-outline',
+  'square.and.arrow.down': 'download-outline',
+  eraser: 'backspace-outline',
+  'plus.circle': 'add-circle-outline',
+  'person.2.fill': 'people',
+  'person.fill.checkmark': 'person-add',
+  'dollarsign.circle.fill': 'cash',
+  'creditcard.fill': 'card',
+  'doc.on.doc': 'copy-outline',
+  'crown.fill': 'ribbon',
+  'chart.bar': 'bar-chart-outline',
+  'person.crop.circle.badge.xmark': 'person-remove-outline',
+  'doc.text.magnifyingglass': 'document-text-outline',
+  'square.and.arrow.up': 'share-outline',
+} as const satisfies Record<string, IoniconName>;
+
+export type SFName = keyof typeof SF_FALLBACKS;
