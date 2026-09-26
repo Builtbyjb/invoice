@@ -1,56 +1,66 @@
-# Welcome to your Expo app 👋
+# ACorp Invoice — React Native (Expo)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+React Native rewrite of the SwiftUI app in `../ios/invoice`, following `../instructions/rewrite-plan.md`.
+Expo SDK 57 · TypeScript (strict) · expo-router · TanStack Form + Zod · TanStack Query · zustand.
 
-## Get started
+## Run
 
-1. Install dependencies
+Expo Go is not supported (remote push, custom native config). Use a development build:
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```sh
+npm install
+npx expo run:ios            # builds the dev client and installs it on the simulator
+npx expo start --dev-client # subsequent runs
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Backend selection (see `.env.example`): `EXPO_PUBLIC_APP_ENV` = `development` | `staging` | `production`
+(set per EAS profile in `eas.json`), with an optional `EXPO_PUBLIC_API_URL` override
+(physical device → your Mac's LAN IP; Android emulator → `http://10.0.2.2:8585`).
 
-### Other setup steps
+## Checks
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```sh
+npx tsc --noEmit
+npx expo lint
+npx jest            # --coverage for the lib/schemas/stores report
+```
 
-## Learn more
+## Layout
 
-To learn more about developing your project with Expo, look at the following resources:
+- `src/app/` — routes only (thin screens). `(auth)` = Welcome/Sign In/Sign Up; `(app)/(tabs)` = native tabs with a
+  Stack per tab; Help/Notifications/Settings live in the `(app)` Stack so they push over the tab bar.
+- `src/features/*` — screen components and React Query hooks per feature.
+- `src/lib/api/*` — one function per endpoint; `client.ts` handles bearer auth and the single-flight 401 refresh.
+- `src/schemas/*` — Zod schemas (API parsing + form validation) and inferred types.
+- `src/stores/*` — zustand stores reachable outside React (auth, notifications, coordinator).
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Deliberate fixes vs. the Swift app (rewrite plan §6)
 
-## Join the community
+1–2. The temporary sign-in token stays in memory (`authStore.pendingOtp`) and is passed explicitly to verify-otp;
+only the real token is persisted.
+5. Search works: Clients uses `GET /clients?name=`, Invoices filters client-side by the client chip and text.
+6–7. Invoice and client delete are wired, with confirmation, and the caches update.
+8–10. Creating an invoice opens its detail. Save is disabled until a client is chosen. Edit sends the currently
+selected client.
+11. Edit pre-fills discount and tax.
+12–13. The PDF uses the invoice currency and renders "Billed To".
+14. The read-only signature scales to fit.
+15. Client card shows "City, Country" with no dangling comma.
+16. Referral earnings always use one currency format.
+17. Save errors show a "Save Failed" alert.
+18. New invoices default to the JWT `preferredCurrency`.
+19. The client form validates the email format.
+20. The Settings footer version comes from `expo-application`.
 
-Join our community of developers creating universal apps.
+Other small additions: pull-to-refresh on lists, error states with "Try Again" on the list and detail screens,
+and a sign-out confirmation.
+A refresh token rejected with any 4xx also signs the user out (Swift only did so on 401); network errors do not.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Still mocked / open (rewrite plan §8, defaults applied)
+
+- Notifications (`/api/v1/notifications…`) return demo data. Device registration only logs the raw APNs token.
+- The PDF keeps the "Your Business Name" / "LOGO" placeholders.
+- No pagination (`meta` is parsed but ignored).
+- Claim / Setup Payment Method are no-ops. Help, Account, Payment, Legal and Subscriptions are placeholders.
+- Android is not polished: date pickers are dialogs, PDF preview falls back to share, push needs FCM credentials.
+- App icon and splash are template placeholders until real assets are provided.
