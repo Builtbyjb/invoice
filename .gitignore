@@ -33,3 +33,10 @@ tools/*.zip
 # Build
 build
 instructions/
+
+# React Native (Expo) app
+mobile/node_modules/
+mobile/ios/
+mobile/android/
+mobile/.expo/
+mobile/coverage/
