@@ -10,3 +10,5 @@ jest.mock('expo-notifications', () => ({
   addNotificationResponseReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
 }));
 jest.mock('expo-crypto', () => ({ randomUUID: () => require('crypto').randomUUID() }));
+require('react-native-gesture-handler/jestSetup');
+jest.mock('react-native-keyboard-controller', () => require('react-native-keyboard-controller/jest'));
