@@ -16,6 +16,6 @@ export const APP_ENV: AppEnv = readAppEnv();
 
 export const API_BASE_URL: string = process.env.EXPO_PUBLIC_API_URL || BASE_URLS[APP_ENV];
 
-if (__DEV__) {
+if (__DEV__ && process.env.NODE_ENV !== 'test') {
   console.log(`[env] APP_ENV=${APP_ENV} API_BASE_URL=${API_BASE_URL}`);
 }
