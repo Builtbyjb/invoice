@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`buildInvoiceHtml matches the snapshot for the demo invoice 1`] = `
+"<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>INV-001</title>
+<style>
+  @page { size: 612pt 792pt; margin: 50pt; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: -apple-system, Helvetica, Arial, sans-serif; color: #000000; font-size: 11pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; }
+  .brand { display: flex; align-items: flex-start; gap: 12pt; }
+  .logo { width: 48pt; height: 48pt; border-radius: 8pt; background: #E5E5EA; border: 1px solid #C7C7CC; display: flex; align-items: center; justify-content: center; font-size: 10pt; font-weight: 700; color: #8E8E93; flex-shrink: 0; }
+  .business { font-size: 20pt; font-weight: 700; margin-top: 4pt; }
+  .title { text-align: right; }
+  .title .label { font-size: 28pt; font-weight: 800; color: #007AFF; line-height: 1.1; }
+  .title .number { font-size: 12pt; font-weight: 500; color: rgba(60,60,67,0.6); margin-top: 4pt; }
+  .section { margin-top: 20pt; }
+  .meta { display: flex; }
+  .meta > div { flex: 1; }
+  .caption { font-size: 10pt; font-weight: 600; color: rgba(60,60,67,0.6); }
+  .meta .value { font-size: 12pt; font-weight: 500; margin-top: 2pt; }
+  .client .name { font-size: 13pt; font-weight: 700; margin-top: 4pt; }
+  .client .line { font-size: 12pt; margin-top: 2pt; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th { height: 32pt; background: #F2F2F7; font-size: 11pt; font-weight: 600; color: rgba(60,60,67,0.6); text-align: left; padding: 0 6pt; }
+  th.num { text-align: right; }
+  td { height: 28pt; font-size: 11pt; padding: 0 6pt; border-bottom: 1px solid #D1D1D6; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  td.num { text-align: right; }
+  tr.alt td { background: rgba(242,242,247,0.3); }
+  .summary { width: 200pt; margin-left: auto; }
+  .summary .row { display: flex; justify-content: space-between; height: 20pt; align-items: center; font-size: 11pt; }
+  .summary .row .k { color: rgba(60,60,67,0.6); }
+  .summary .total { border-top: 1.5pt solid #000000; margin-top: 4pt; }
+  .summary .total .v { font-size: 12pt; font-weight: 700; }
+  .notes { font-size: 11pt; max-height: 60pt; overflow: hidden; margin-top: 4pt; white-space: pre-wrap; }
+  .signature { width: 200pt; height: 80pt; background: #E5E5EA; border: 1px solid #C7C7CC; margin-top: 4pt; }
+  .signature svg { width: 100%; height: 100%; display: block; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="brand">
+      <div class="logo">LOGO</div>
+      <div class="business">Your Business Name</div>
+    </div>
+    <div class="title">
+      <div class="label">INVOICE</div>
+      <div class="number">INV-001</div>
+    </div>
+  </div>
+
+  <div class="section meta">
+    <div><div class="caption">Status</div><div class="value">sent</div></div>
+    <div><div class="caption">Issue Date</div><div class="value">Dec 31, 2023</div></div>
+    <div><div class="caption">Due Date</div><div class="value">Jan 31, 2024</div></div>
+  </div>
+
+  <div class="section client">
+    <div class="caption">Billed To</div>
+    <div class="name">Acme Corp</div>
+    <div class="line">billing@acme.com</div>
+    <div class="line">+1 555 1234</div>
+    <div class="line">123 Main St, New York, US</div>
+  </div>
+
+  <table class="section">
+    <colgroup>
+      <col style="width:45%" /><col style="width:15%" /><col style="width:12%" /><col style="width:14%" /><col style="width:14%" />
+    </colgroup>
+    <thead>
+      <tr><th>Description</th><th class="num">Qty</th><th class="num">Unit</th><th class="num">Price</th><th class="num">Total</th></tr>
+    </thead>
+    <tbody>
+        <tr class="">
+          <td class="desc">Consulting</td>
+          <td class="num">10.0</td>
+          <td class="num">hr</td>
+          <td class="num">$150.00</td>
+          <td class="num">$1,500.00</td>
+        </tr>
+    </tbody>
+  </table>
+
+  <div class="section summary">
+    <div class="row"><span class="k">Subtotal</span><span class="v">$1,500.00</span></div>
+    <div class="row"><span class="k">Discount (0.0%)</span><span class="v">$0.00</span></div>
+    <div class="row"><span class="k">Tax (10.0%)</span><span class="v">$150.00</span></div>
+    <div class="row total"><span class="k">Grand Total</span><span class="v">$1,650.00</span></div>
+  </div>
+
+  <div class="section"><div class="caption">Notes</div><div class="notes">Demo invoice for preview and deep-link testing.</div></div>
+
+  
+</body>
+</html>"
+`;
