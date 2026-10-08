@@ -3,7 +3,12 @@
     {
       "files": "**/*.{ts,js,mjs}",
       "options": {
-        "printWidth": 100,
+        "tabWidth": 4
+      }
+    },
+    {
+      "files": "**/*.{json,jsonc}",
+      "options": {
         "tabWidth": 4
       }
     }

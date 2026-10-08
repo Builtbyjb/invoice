@@ -61,7 +61,7 @@ userRouteV1.get("/dashboard/stats", async (c) => {
 
     // console.log(data);
 
-    return c.json({ message: "Success", data }, 200);
+    return c.json({ message: "success", data }, 200);
 });
 
 userRouteV1.get(

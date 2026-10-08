@@ -1,20 +1,23 @@
 {
-  "scripts": {
-    "dev:web": "npx turbo dev --filter=web",
-    "dev:ios": "npx turbo dev:ios",
-    "dev:server": "npx turbo dev:server"
-  },
-  "devDependencies": {
-    "turbo": "^2.11.7"
-  },
-   "devEngines": {
-     "packageManager": {
-       "name": "npm",
-       "version": "11.21.0"
-     }
-   },
-   "workspaces": [
-     "apps/*",
-     "packages/*"
-   ]
+    "name": "invoice",
+    "private": true,
+    "scripts": {
+        "dev:web": "npx turbo dev --filter=web",
+        "dev:ios": "npx turbo dev:ios",
+        "dev:server": "npx turbo dev:server",
+        "test:server": "npx turbo test:server"
+    },
+    "devDependencies": {
+        "turbo": "^2.11.7"
+    },
+    "devEngines": {
+        "packageManager": {
+            "name": "npm",
+            "version": "11.21.0"
+        }
+    },
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ]
 }
