@@ -1,0 +1,27 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "types": [
+      "jest",
+      "node"
+    ],
+    "paths": {
+      "@/*": [
+        "apps/mobile/src/*"
+      ],
+      "@/assets/*": [
+        "apps/mobile/assets/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "../.expo/types/**/*.ts",
+    "apps/mobile/expo-env.d.ts",
+    "apps/mobile/.expo/types/**/*.ts",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ]
+}
