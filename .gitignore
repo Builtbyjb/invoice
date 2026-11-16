@@ -85,3 +85,7 @@ example
 /android
 
 CHECKLIST.md
+ROADMAP.md
+
+.turbo
+.env

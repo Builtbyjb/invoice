@@ -1,0 +1,81 @@
+import { ContentfulStatusCode } from "hono/utils/http-status";
+import type { JWTPayload } from "hono/utils/jwt/types";
+import { clients, invoices } from "@/db/schema";
+
+export type ENV = {
+    DB: Hyperdrive;
+    OTP_EMAIL: string;
+    JWT_SECRET: string;
+    SEND_EMAIL: {
+        send: (email: {
+            to: string;
+            from: string;
+            subject: string;
+            text: string;
+            html?: string;
+        }) => Promise<any>;
+    };
+    ENV: string;
+    INVOICE_URL: string;
+    SERVER_URL: string;
+    R2: R2Bucket;
+    RATE_LIMITER: RateLimit;
+    KV_STORE: KVNamespace;
+};
+
+export type BaseTokenPayload = {
+    userID: number;
+    email: string;
+    firstname: string;
+    currentOrgID: number;
+    organizationName?: string;
+    otp?: string;
+};
+
+export type TokenPayload = JWTPayload & BaseTokenPayload;
+
+export type ReturnId = {
+    id: number | undefined;
+};
+
+export class ErrorResult extends Error {
+    public code: ContentfulStatusCode;
+
+    constructor(message: string, code: ContentfulStatusCode, options?: ErrorOptions) {
+        super(message, options);
+
+        this.code = code;
+        this.name = "ErrorResult";
+
+        Object.setPrototypeOf(this, ErrorResult.prototype);
+    }
+}
+
+export type MonthlyRevenue = {
+    month: string;
+    amount: number;
+};
+
+export type DashboardStats = {
+    paidCount: number;
+    sentCount: number;
+    overdueCount: number;
+    draftCount: number;
+};
+
+export type Dashboard = {
+    stats: DashboardStats;
+    monthlyRevenues: MonthlyRevenue[];
+};
+
+export type Country = {
+    name: string;
+    currency: string;
+};
+
+export type PaginationMetadata = {
+    totalCount: number;
+    totalPages: number;
+    currentPage: number;
+    perPage: number;
+};
