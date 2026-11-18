@@ -10,6 +10,12 @@ import {
 } from "drizzle-orm/pg-core";
 import type { InvoiceNumber, InvoiceItem, InvoiceClientInfo } from "@/lib/types/invoice-types";
 
+const baseColumns = {
+    deleted: boolean("deleted").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+};
+
 export const users = pgTable("users", {
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
     email: varchar("email").notNull().unique(),
@@ -19,9 +25,7 @@ export const users = pgTable("users", {
     firstname: varchar("firstname").notNull(),
     lastname: varchar("lastname").notNull(),
     avatarURL: varchar("avatar_url"),
-    deleted: boolean("deleted").notNull().default(false),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...baseColumns,
 });
 
 export const organizations = pgTable("organizations", {
@@ -45,9 +49,7 @@ export const organizations = pgTable("organizations", {
     totalEarnings: numeric("total_earnings").$type<number>().notNull().default(0),
     currency: varchar("currency").notNull().default("NGN"),
     referralPayoutMethod: varchar("referral_payout_method"),
-    deleted: boolean("deleted").notNull().default(false),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...baseColumns,
 });
 
 export const members = pgTable("members", {
@@ -63,9 +65,7 @@ export const members = pgTable("members", {
         .notNull(),
     startDate: timestamp("start_date", { withTimezone: true }).defaultNow(),
     endDate: timestamp("end_date", { withTimezone: true }),
-    deleted: boolean("deleted").notNull().default(false),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...baseColumns,
 });
 
 export const roles = pgTable("roles", {
@@ -86,9 +86,7 @@ export const clients = pgTable("clients", {
     city: varchar("city"),
     country: varchar("country"),
     note: varchar("note"),
-    deleted: boolean("deleted").notNull().default(false),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...baseColumns,
 });
 
 export const invoices = pgTable("invoices", {
@@ -111,9 +109,7 @@ export const invoices = pgTable("invoices", {
     currency: varchar("currency").notNull(),
     paymentDate: timestamp("payment_date", { withTimezone: true }),
     notified: boolean("notified").notNull().default(false),
-    deleted: boolean("deleted").notNull().default(false),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    ...baseColumns,
 });
 
 export const payouts = pgTable("payouts", {

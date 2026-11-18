@@ -1,4 +1,4 @@
-import { Country } from "@/lib/types";
+import type { Country } from "../types";
 
 export const COUNTRIES: Country[] = [
     { name: "Afghanistan", currency: "AFN" },

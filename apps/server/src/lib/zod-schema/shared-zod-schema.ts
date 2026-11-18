@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_IMAGE_SIZE, ACCEPTED_IMAGE_TYPES } from "../constants";
+import { MAX_IMAGE_SIZE, ACCEPTED_IMAGE_TYPES } from "@invoice/shared";
 
 export const UserSchema = z.object({
     firstname: z.string(),
@@ -11,11 +11,6 @@ export const UserSchema = z.object({
             (blob) => !blob || ACCEPTED_IMAGE_TYPES.includes(blob?.type),
             "Only .jpg, .jpeg, .png and .webp formats are supported.",
         ),
-});
-
-export const UserSettingsSchema = z.object({
-    firstname: z.string(),
-    avatarURL: z.string().nullable(),
 });
 
 export const BusinessSchema = z.object({
@@ -45,13 +40,6 @@ export const BusinessSettingsSchema = z.object({
     address: z.string(),
     city: z.string(),
     country: z.string(),
-});
-
-export const TopStatsSchema = z.object({
-    totalRevenue: z.number(),
-    paidInvoices: z.number(),
-    pendingInvoices: z.number(),
-    totalClients: z.number(),
 });
 
 export const FeedbackSchema = z.object({

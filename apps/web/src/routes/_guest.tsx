@@ -31,9 +31,6 @@ function GuestLayout() {
   );
 }
 
-/*
- * Routes that do not require a user to be authenticated
- */
 export const Route = createFileRoute("/_guest")({
   component: GuestLayout,
 });
