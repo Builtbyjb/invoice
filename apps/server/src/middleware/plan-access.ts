@@ -1,5 +1,5 @@
 import { MiddlewareHandler } from "hono";
-import type { TokenPayload, ENV } from "@/lib/types/shared-types";
+import type { TokenPayload, ENV } from "@/lib/types";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { clients, invoices } from "@/db/schema";
 import { organizations } from "@/db/schema";

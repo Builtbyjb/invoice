@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { ENV, TokenPayload } from "@/lib/types/shared-types";
+import type { ENV, TokenPayload } from "@/lib/types";
 import { zValidator } from "@hono/zod-validator";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { ClientFormSchema, ClientQuerySchema } from "@/lib/zod-schema/client-zod-schema";

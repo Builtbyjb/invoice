@@ -10,14 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SplatRouteImport } from './routes/$'
+import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as GuestRouteImport } from './routes/_guest'
 import { Route as GuestIndexRouteImport } from './routes/_guest/index'
+import { Route as AuthDashboardIndexRouteImport } from './routes/_auth/dashboard/index'
+import { Route as AuthReferralIndexRouteImport } from './routes/_auth/referral/index'
+import { Route as AuthSettingsIndexRouteImport } from './routes/_auth/settings/index'
 import { Route as GuestPrivacyPolicyIndexRouteImport } from './routes/_guest/privacy-policy/index'
 import { Route as GuestTermsOfServiceIndexRouteImport } from './routes/_guest/terms-of-service/index'
 
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuestRoute = GuestRouteImport.update({
@@ -28,6 +36,21 @@ const GuestIndexRoute = GuestIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => GuestRoute,
+} as any)
+const AuthDashboardIndexRoute = AuthDashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthReferralIndexRoute = AuthReferralIndexRouteImport.update({
+  id: '/referral/',
+  path: '/referral/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSettingsIndexRoute = AuthSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => AuthRoute,
 } as any)
 const GuestPrivacyPolicyIndexRoute = GuestPrivacyPolicyIndexRouteImport.update({
   id: '/privacy-policy/',
@@ -44,39 +67,68 @@ const GuestTermsOfServiceIndexRoute =
 export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/': typeof GuestIndexRoute
+  '/dashboard/': typeof AuthDashboardIndexRoute
+  '/referral/': typeof AuthReferralIndexRoute
+  '/settings/': typeof AuthSettingsIndexRoute
   '/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
   '/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
 }
 export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/': typeof GuestIndexRoute
+  '/dashboard': typeof AuthDashboardIndexRoute
+  '/referral': typeof AuthReferralIndexRoute
+  '/settings': typeof AuthSettingsIndexRoute
   '/privacy-policy': typeof GuestPrivacyPolicyIndexRoute
   '/terms-of-service': typeof GuestTermsOfServiceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/$': typeof SplatRoute
+  '/_auth': typeof AuthRouteWithChildren
   '/_guest': typeof GuestRouteWithChildren
   '/_guest/': typeof GuestIndexRoute
+  '/_auth/dashboard/': typeof AuthDashboardIndexRoute
+  '/_auth/referral/': typeof AuthReferralIndexRoute
+  '/_auth/settings/': typeof AuthSettingsIndexRoute
   '/_guest/privacy-policy/': typeof GuestPrivacyPolicyIndexRoute
   '/_guest/terms-of-service/': typeof GuestTermsOfServiceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/$' | '/' | '/privacy-policy/' | '/terms-of-service/'
+  fullPaths:
+    | '/$'
+    | '/'
+    | '/dashboard/'
+    | '/referral/'
+    | '/settings/'
+    | '/privacy-policy/'
+    | '/terms-of-service/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/$' | '/' | '/privacy-policy' | '/terms-of-service'
+  to:
+    | '/$'
+    | '/'
+    | '/dashboard'
+    | '/referral'
+    | '/settings'
+    | '/privacy-policy'
+    | '/terms-of-service'
   id:
     | '__root__'
     | '/$'
+    | '/_auth'
     | '/_guest'
     | '/_guest/'
+    | '/_auth/dashboard/'
+    | '/_auth/referral/'
+    | '/_auth/settings/'
     | '/_guest/privacy-policy/'
     | '/_guest/terms-of-service/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
+  AuthRoute: typeof AuthRouteWithChildren
   GuestRoute: typeof GuestRouteWithChildren
 }
 
@@ -87,6 +139,13 @@ declare module '@tanstack/react-router' {
       path: '/$'
       fullPath: '/$'
       preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_guest': {
@@ -102,6 +161,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof GuestIndexRouteImport
       parentRoute: typeof GuestRoute
+    }
+    '/_auth/dashboard/': {
+      id: '/_auth/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof AuthDashboardIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/referral/': {
+      id: '/_auth/referral/'
+      path: '/referral'
+      fullPath: '/referral/'
+      preLoaderRoute: typeof AuthReferralIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/settings/': {
+      id: '/_auth/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof AuthSettingsIndexRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_guest/privacy-policy/': {
       id: '/_guest/privacy-policy/'
@@ -120,6 +200,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthRouteChildren {
+  AuthDashboardIndexRoute: typeof AuthDashboardIndexRoute
+  AuthReferralIndexRoute: typeof AuthReferralIndexRoute
+  AuthSettingsIndexRoute: typeof AuthSettingsIndexRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthDashboardIndexRoute: AuthDashboardIndexRoute,
+  AuthReferralIndexRoute: AuthReferralIndexRoute,
+  AuthSettingsIndexRoute: AuthSettingsIndexRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 interface GuestRouteChildren {
   GuestIndexRoute: typeof GuestIndexRoute
   GuestPrivacyPolicyIndexRoute: typeof GuestPrivacyPolicyIndexRoute
@@ -136,6 +230,7 @@ const GuestRouteWithChildren = GuestRoute._addFileChildren(GuestRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
+  AuthRoute: AuthRouteWithChildren,
   GuestRoute: GuestRouteWithChildren,
 }
 export const routeTree = rootRouteImport

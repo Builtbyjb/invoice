@@ -1,4 +1,3 @@
-import { useInView } from "@/hooks/useInView";
 import { Star } from "lucide-react";
 
 const testimonials = [
@@ -39,31 +38,20 @@ function StarRating({ className = "" }: { className?: string }) {
 }
 
 export default function Testimonials() {
-  const { ref, isVisible } = useInView<HTMLElement>({ threshold: 0.1 });
 
   return (
-    <section ref={ref} className="py-24 md:py-32 bg-white relative overflow-hidden">
+    <section className="py-24 md:py-32 bg-white relative overflow-hidden">
       <div className="container relative z-10 mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-16 md:mb-20">
           <div
             className="inline-flex items-center gap-2 px-3 py-1.5 border border-black/20 text-[10px] font-mono font-bold tracking-[0.2em] uppercase text-neutral-500 mb-6"
-            style={{
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? "translateY(0)" : "translateY(10px)",
-              transition: "all 0.5s ease-out",
-            }}
           >
             <span className="w-1.5 h-1.5 bg-black" />
             TESTIMONIALS
           </div>
           <h2
             className="text-3xl md:text-4xl lg:text-6xl font-bold tracking-tight text-black leading-tight"
-            style={{
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? "translateY(0)" : "translateY(10px)",
-              transition: "all 0.5s ease-out 0.1s",
-            }}
           >
             What people are saying.
           </h2>
@@ -74,11 +62,6 @@ export default function Testimonials() {
           {testimonials.map((t, i) => (
             <div
               key={t.author}
-              style={{
-                opacity: isVisible ? 1 : 0,
-                transform: isVisible ? "translateY(0)" : "translateY(20px)",
-                transition: `all 0.7s cubic-bezier(0.22, 1, 0.36, 1) ${200 + i * 100}ms`,
-              }}
             >
               <div className="h-full bg-white border border-black/10 p-6 md:p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <div className="h-full flex flex-col justify-between">

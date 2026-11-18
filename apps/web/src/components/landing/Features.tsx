@@ -1,4 +1,3 @@
-import { useInView } from "@/hooks/useInView";
 import { FileText, Clock, DollarSign, Users, BarChart3, Receipt } from "lucide-react";
 
 const features = [
@@ -41,10 +40,9 @@ const features = [
 ];
 
 export default function Features() {
-  const { ref, isVisible } = useInView<HTMLElement>({ threshold: 0.1 });
 
   return (
-    <section ref={ref} className="py-24 md:py-32 bg-brand-bg relative overflow-hidden">
+    <section className="py-24 md:py-32 bg-brand-bg relative overflow-hidden">
       {/* Background texture */}
       <div className="absolute inset-0 bg-dot-matrix opacity-20 pointer-events-none" />
 
@@ -53,32 +51,17 @@ export default function Features() {
         <div className="mb-20 max-w-2xl">
           <div
             className="inline-flex items-center gap-2 px-3 py-1.5 border border-brand-secondary/20 text-[10px] font-mono font-bold tracking-[0.2em] uppercase text-brand-secondary mb-6"
-            style={{
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? "translateY(0)" : "translateY(10px)",
-              transition: "all 0.5s ease-out",
-            }}
           >
             <span className="w-1.5 h-1.5 bg-brand-accent" />
             ITEMIZED
           </div>
           <h2
             className="text-3xl md:text-4xl lg:text-6xl font-bold tracking-tight text-brand-ink leading-tight mb-6"
-            style={{
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? "translateY(0)" : "translateY(10px)",
-              transition: "all 0.5s ease-out 0.1s",
-            }}
           >
             Everything you need, nothing you don't.
           </h2>
           <p
             className="text-lg text-brand-secondary leading-relaxed"
-            style={{
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? "translateY(0)" : "translateY(10px)",
-              transition: "all 0.5s ease-out 0.2s",
-            }}
           >
             A focused toolkit for creating, sending, and tracking invoices. No bloat, no noise.
           </p>
@@ -101,11 +84,6 @@ export default function Features() {
               <div
                 key={feature.title}
                 className="group grid grid-cols-1 md:grid-cols-12 gap-4 py-6 border-b border-brand-secondary/10 hover:bg-white/60 transition-colors duration-300 cursor-default"
-                style={{
-                  opacity: isVisible ? 1 : 0,
-                  transform: isVisible ? "translateY(0)" : "translateY(20px)",
-                  transition: `all 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${300 + i * 80}ms`,
-                }}
               >
                 {/* Number */}
                 <div className="md:col-span-1 flex items-center gap-3">

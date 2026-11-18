@@ -1,27 +1,34 @@
 import { FileText } from "lucide-react";
 import { DownloadButton } from "@/components/DownloadButton";
-import type { Invoice, InvoiceItem } from "@shared/lib/types";
+import type { Invoice, InvoiceItem } from "@invoice/shared";
+import { InvoiceStatus } from "@invoice/shared";
 
-const mockInvoice: Omit<Invoice, "id" | "clientId" | "createdAt"> & { clientName: string; clientEmail: string } = {
+const mockInvoice: Omit<Invoice, "id" | "clientID" | "createdAt"> = {
   invoiceNumber: "INV-2026-001",
-  clientName: "Meridian Studios",
-  clientEmail: "billing@meridian.co",
+  clientInfo: {
+    name: "Meridian Studios",
+    email: "billing@meridian.co",
+    phone: "555-787-7766",
+    address: "somewhere",
+    city: "Toronto",
+    country: "Canada"
+  },
   items: [
-    { description: "Brand Identity Design", quantity: 1, unitPrice: 4500 },
-    { description: "Frontend Development", quantity: 1, unitPrice: 4850 },
+    { id: "1", description: "Brand Identity Design", quantity: 1, unit: null, price: 4500 },
+    { id: "2", description: "Frontend Development", quantity: 1, unit: null, price: 4850 },
   ],
   taxRate: 0,
   discount: 0,
-  status: "paid",
+  status: InvoiceStatus.paid,
   signature: null,
-  issueDate: "2026-05-01",
-  dueDate: "2026-05-17",
+  issueDate: new Date("2026-05-01"),
+  dueDate: new Date("2026-05-17"),
   currency: "USD",
   notes: "",
 };
 
-const calculateTotal = (items: InvoiceItem[]) => {
-  return items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+const calculateTotal = (items: readonly InvoiceItem[]) => {
+  return items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
 };
 
 export default function Hero() {
@@ -95,9 +102,9 @@ export default function Hero() {
         </div>
 
         {/* Right Column — Receipt Card */}
-        <div className="lg:col-span-6 relative h-[500px] md:h-[600px] hidden md:flex items-center justify-center">
+        <div className="lg:col-span-6 relative h-125 md:h-150 hidden md:flex items-center justify-center">
           {/* The Receipt */}
-          <div className="relative receipt-3d receipt-shadow paper-texture bg-white p-8 w-[380px] receipt-top receipt-bottom receipt-tear animate-fade-in">
+          <div className="relative receipt-3d receipt-shadow paper-texture bg-white p-8 w-95 receipt-top receipt-bottom receipt-tear animate-fade-in">
             {/* Receipt Header */}
             <div className="flex justify-between items-start mb-6">
               <div>
@@ -129,8 +136,8 @@ export default function Hero() {
               <p className="text-[10px] font-mono font-bold tracking-widest text-brand-secondary uppercase mb-1">
                 BILL TO
               </p>
-              <p className="text-sm font-bold text-brand-ink">{mockInvoice.clientName}</p>
-              <p className="text-xs font-mono text-brand-secondary">{mockInvoice.clientEmail}</p>
+              <p className="text-sm font-bold text-brand-ink">{mockInvoice.clientInfo.name}</p>
+              <p className="text-xs font-mono text-brand-secondary">{mockInvoice.clientInfo.email}</p>
             </div>
 
             {/* Line Items */}
@@ -140,11 +147,11 @@ export default function Hero() {
                   <div>
                     <p className="font-bold text-brand-ink">{item.description}</p>
                     <p className="text-xs font-mono text-brand-secondary">
-                      {item.quantity}x @ ${item.unitPrice.toLocaleString()}
+                      {item.quantity}x @ ${item.price.toLocaleString()}
                     </p>
                   </div>
                   <p className="font-mono font-bold text-brand-ink tabular-nums">
-                    ${(item.quantity * item.unitPrice).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    ${(item.quantity * item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </p>
                 </div>
               ))}

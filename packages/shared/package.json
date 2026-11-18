@@ -1,0 +1,16 @@
+{
+  "name": "@invoice/shared",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": { },
+  "devDependencies": {
+    "typescript": "~6.0.2"
+  }
+}
