@@ -1,6 +1,5 @@
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JWTPayload } from "hono/utils/jwt/types";
-import { clients, invoices } from "@/db/schema";
 
 export type ENV = {
     DB: Hyperdrive;
@@ -66,11 +65,6 @@ export type DashboardStats = {
 export type Dashboard = {
     stats: DashboardStats;
     monthlyRevenues: MonthlyRevenue[];
-};
-
-export type Country = {
-    name: string;
-    currency: string;
 };
 
 export type PaginationMetadata = {

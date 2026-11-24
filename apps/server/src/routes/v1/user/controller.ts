@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { ENV, TokenPayload, DashboardStats, MonthlyRevenue } from "@/lib/types/shared-types";
+import type { ENV, TokenPayload, DashboardStats, MonthlyRevenue } from "@/lib/types";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { eq, and, count, sql } from "drizzle-orm";
 import { invoices } from "@/db/schema";

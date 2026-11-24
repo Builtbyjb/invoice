@@ -3,7 +3,7 @@ import { Client } from "pg";
 import { clients, invoices } from "../db/schema";
 import { users, organizations, payouts } from "../db/schema";
 import { eq, and, sql } from "drizzle-orm";
-import { getSubscriptionAmount } from "../api/v1/referral/service";
+import { getSubscriptionAmount } from "../routes/v1/referral/service";
 import { type ENV } from "./types";
 
 const REWARD = 0.05;
@@ -91,6 +91,7 @@ async function createPaystackRecipient(bankDetails: any, env: ENV): Promise<stri
         if (result.status && result.data?.recipient_code) {
             return result.data.recipient_code;
         }
+
         return null;
     } catch (error) {
         console.error("Failed to create Paystack recipient:", error);

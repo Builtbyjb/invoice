@@ -1,18 +1,15 @@
-import { useInView } from "@/hooks/useInView";
-import { useCountUp } from "@/hooks/useCountUp";
-
 interface StatItemProps {
   value: number;
   prefix?: string;
   suffix?: string;
   label: string;
   decimals?: number;
-  isVisible: boolean;
+  isVisible?: boolean;
   delay?: number;
 }
 
-function StatItem({ value, prefix = "", suffix = "", label, decimals = 0, isVisible, delay = 0 }: StatItemProps) {
-  const count = useCountUp(value, isVisible, { duration: 2000, decimals });
+function StatItem({ value, prefix = "", suffix = "", label, decimals = 0, isVisible = true, delay = 0 }: StatItemProps) {
+  // const count = useCountUp(value, isVisible, { duration: 2000, decimals });
 
   const formatValue = (num: number): string => {
     if (value >= 1000000) return (num / 1000000).toFixed(1);
@@ -37,7 +34,7 @@ function StatItem({ value, prefix = "", suffix = "", label, decimals = 0, isVisi
       }}
     >
       <div className="text-4xl sm:text-5xl md:text-6xl font-bold font-mono tracking-tighter text-brand-ink tabular-nums mb-2">
-        {prefix}{formatValue(count)}{getSuffix()}
+        {/*{prefix}{formatValue(count)}{getSuffix()}*/}
       </div>
       <p className="text-xs font-mono font-bold tracking-widest uppercase text-brand-secondary">
         {label}
@@ -54,10 +51,10 @@ const stats = [
 ];
 
 export default function Stats() {
-  const { ref, isVisible } = useInView<HTMLElement>({ threshold: 0.2 });
+  // const { ref, isVisible } = useInView<HTMLElement>({ threshold: 0.2 });
 
   return (
-    <section ref={ref} className="relative py-20 md:py-24 bg-white border-y border-brand-secondary/15">
+    <section className="relative py-20 md:py-24 bg-white border-y border-brand-secondary/15">
       {/* Dot matrix background */}
       <div className="absolute inset-0 bg-dot-matrix opacity-30 pointer-events-none" />
 
@@ -66,20 +63,11 @@ export default function Stats() {
         <div className="mb-16">
           <p
             className="text-[10px] font-mono font-bold tracking-[0.3em] uppercase text-brand-secondary mb-4"
-            style={{
-              opacity: isVisible ? 1 : 0,
-              transition: "opacity 0.5s ease-out",
-            }}
           >
             // THE TOTALS
           </p>
           <h2
             className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-brand-ink leading-tight"
-            style={{
-              opacity: isVisible ? 1 : 0,
-              transform: isVisible ? "translateY(0)" : "translateY(10px)",
-              transition: "all 0.5s ease-out 0.1s",
-            }}
           >
             Numbers that speak.
           </h2>
@@ -91,7 +79,6 @@ export default function Stats() {
             <div key={stat.label} className="relative">
               <StatItem
                 {...stat}
-                isVisible={isVisible}
                 delay={200 + i * 100}
               />
               {/* Vertical dashed separator on desktop */}
@@ -103,7 +90,7 @@ export default function Stats() {
         </div>
 
         {/* Bottom dashed line */}
-        <div className="hr-dashed mt-16 animate-print-line" style={{ opacity: isVisible ? 1 : 0, transition: "opacity 0.5s ease-out 0.8s" }} />
+        <div className="hr-dashed mt-16 animate-print-line" />
       </div>
     </section>
   );

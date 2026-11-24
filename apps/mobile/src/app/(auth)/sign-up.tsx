@@ -1,38 +1,38 @@
-import { useForm } from '@tanstack/react-form';
-import { router } from 'expo-router';
-import { View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useForm } from "@tanstack/react-form";
+import { router } from "expo-router";
+import { View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { FormTextField } from '../../components/fields/bound';
-import { useFieldError } from '../../components/fields/errors';
-import { SelectField } from '../../components/fields/SelectField';
-import { toOptions } from '../../components/SelectSheet';
-import { PrimaryButton } from '../../components/PrimaryButton';
-import { Text } from '../../components/Text';
-import { TextButton } from '../../components/TextButton';
-import { countries } from '../../constants/countries';
-import { useTheme } from '../../constants/theme';
-import { OtpSheet } from '../../features/auth/OtpSheet';
-import { useStartOtp } from '../../features/auth/useStartOtp';
-import { signUp } from '../../lib/api/auth';
-import { signUpFormSchema, type SignUpFormValues } from '../../schemas/auth';
+import { FormTextField } from "../../components/fields/bound";
+import { useFieldError } from "../../components/fields/errors";
+import { SelectField } from "../../components/fields/SelectField";
+import { toOptions } from "../../components/SelectSheet";
+import { PrimaryButton } from "../../components/PrimaryButton";
+import { Text } from "../../components/Text";
+import { TextButton } from "../../components/TextButton";
+import { countries } from "../../constants/countries";
+import { useTheme } from "../../constants/theme";
+import { OtpSheet } from "../../features/auth/OtpSheet";
+import { useStartOtp } from "../../features/auth/useStartOtp";
+import { signUp } from "../../lib/api/auth";
+import { signUpFormSchema, type SignUpFormValues } from "../../schemas/auth";
 
-import type { AnyFieldApi } from '@tanstack/react-form';
+import type { AnyFieldApi } from "@tanstack/react-form";
 
 const countryOptions = toOptions(countries);
 
 /** Port of SignUpView. */
 export default function SignUpScreen() {
   const { colors } = useTheme();
-  const otp = useStartOtp('Sign Up Failed');
+  const otp = useStartOtp("Sign Up Failed");
 
   const defaultValues: SignUpFormValues = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    businessName: '',
-    country: 'United States',
-    referral: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    businessName: "",
+    country: "United States",
+    referral: "",
   };
 
   const form = useForm({
@@ -137,8 +137,8 @@ export default function SignUpScreen() {
           )}
         </form.Subscribe>
 
-        <View style={{ alignItems: 'flex-start' }}>
-          <TextButton title="Already have an account? Sign In" onPress={() => router.replace('/sign-in')} />
+        <View style={{ alignItems: "flex-start" }}>
+          <TextButton title="Already have an account? Sign In" onPress={() => router.replace("/sign-in")} />
         </View>
       </KeyboardAwareScrollView>
       <OtpSheet visible={otp.otpVisible} onClose={otp.closeOtp} />

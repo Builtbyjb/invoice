@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ENV } from "@/lib/types/shared-types";
+import { ENV } from "@/lib/types";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { DrizzleQueryError, eq } from "drizzle-orm";
 import { members, organizations, users } from "@/db/schema";
@@ -11,8 +11,8 @@ import {
     handleZodValidate,
     getTokenFromHeader,
 } from "@/lib/utils";
-import type { Country, TokenPayload, BaseTokenPayload } from "@/lib/types/shared-types";
-import { ErrorResult } from "@/lib/types/shared-types";
+import type { Country, TokenPayload, BaseTokenPayload } from "@/lib/types";
+import { ErrorResult } from "@/lib/types";
 import { getAccessTokenExp, getRefreshTokenExp } from "@/lib/constants";
 import { signinSchema, otpSchema, signupSchema, refreshSchema } from "./zod-schema";
 import {
