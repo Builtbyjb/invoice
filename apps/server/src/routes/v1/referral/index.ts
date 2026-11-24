@@ -12,7 +12,7 @@ import { generateReferralCode, generateReferralLink, getSubscriptionAmount } fro
 const referralRouteV1 = new Hono<{
     Bindings: ENV;
     Variables: { db: NodePgDatabase; jwtPayload: TokenPayload };
-}>().basePath("/referral");
+}>;
 
 referralRouteV1.use("*", authMiddleware());
 

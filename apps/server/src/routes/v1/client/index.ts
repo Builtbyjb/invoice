@@ -19,7 +19,7 @@ import { FetchedClients } from "@/lib/types/client-types";
 const clientRouteV1 = new Hono<{
     Bindings: ENV;
     Variables: { db: NodePgDatabase; jwtPayload: TokenPayload };
-}>().basePath("/clients");
+}>();
 
 clientRouteV1.use("*", authMiddleware());
 

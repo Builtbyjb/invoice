@@ -18,7 +18,7 @@ import {
 const userRouteV1 = new Hono<{
     Bindings: ENV;
     Variables: { db: NodePgDatabase; jwtPayload: TokenPayload };
-}>().basePath("/user");
+}>();
 
 userRouteV1.use("*", authMiddleware());
 

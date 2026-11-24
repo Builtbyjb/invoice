@@ -2,6 +2,10 @@ import type { MonthlyRevenue } from "@/lib/types";
 import type { Invoice } from "@/lib/invoice/types";
 import { calculateTotalAmount } from "@/lib/utils";
 
+export class UserService {
+
+}
+
 export function getMonthlyRevenues(
     invoices: Invoice[],
     year: number,

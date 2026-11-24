@@ -1,14 +1,14 @@
 import { MiddlewareHandler } from "hono";
 import type { TokenPayload, ENV } from "@/lib/types";
 import { verify } from "hono/jwt";
-import { getTokenFromHeader } from "@/lib/utils";
+import { AuthService } from "@/routes/v1/auth/service";
 
 export default function authMiddleware(): MiddlewareHandler<{
     Bindings: ENV;
     Variables: { jwtPayload: TokenPayload };
 }> {
     return async (c, next) => {
-        const accessToken = getTokenFromHeader(c);
+        const accessToken = AuthService.getTokenFromHeader(c);
         if (!accessToken) return c.json({ message: "Unauthorized: Access token not found" }, 401);
 
         const secret = c.env.JWT_SECRET;

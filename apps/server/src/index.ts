@@ -1,19 +1,12 @@
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { cors } from "hono/cors";
 import { ENV } from "@/lib/types";
 import { invoiceNotify, payout } from "./crons";
 import rateLimiterMiddleware from "./middleware/rate-limiter";
-import injectDb from "./middleware/database";
 
 /* App routes */
-import authRouteV1 from "@/routes/v1/auth/controller";
-import userRouteV1 from "@/routes/v1/user/controller";
-import clientRouteV1 from "@/routes/v1/client/controller";
-import invoiceRouteV1 from "@/routes/v1/invoice/controller";
-import referralRouteV1 from "@/routes/v1/referral/controller";
-import blobRouteV1 from "@/routes/v1/blob/controller";
-
-import { INTERNAL_ERROR_MESSAGE } from "./lib/constants";
+import routesV1 from "./routes/v1";
 
 const app = new Hono<{ Bindings: ENV }>();
 
@@ -36,20 +29,16 @@ app.use(
 );
 
 app.use("/api/*", rateLimiterMiddleware());
-app.use("/api/*", injectDb());
 
 app.onError((error, c) => {
+    const INTERNAL_ERROR_MESSAGE = "We are currently experiencing an internal issue that’s affecting this request. Our team is actively investigating and working to resolve it as quickly as possible.";
     console.error(`${error.message}: ${error.stack}: ${error.cause}`);
-    return c.json({ message: INTERNAL_ERROR_MESSAGE }, 500);
+    if (error instanceof HTTPException) return error.getResponse();
+    return c.json({ error: INTERNAL_ERROR_MESSAGE }, 500);
 });
 
 /* Register routes */
-app.route("/api/v1", authRouteV1);
-app.route("/api/v1", userRouteV1);
-app.route("/api/v1", clientRouteV1);
-app.route("/api/v1", invoiceRouteV1);
-app.route("/api/v1", referralRouteV1);
-app.route("/api/v1", blobRouteV1);
+app.route("/api/v1", routesV1);
 
 export default {
     fetch: app.fetch,

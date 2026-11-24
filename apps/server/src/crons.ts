@@ -1,24 +1,15 @@
-import { drizzle, NodePgDatabase } from "drizzle-orm/node-postgres";
-import { Client } from "pg";
-import { clients, invoices } from "../db/schema";
-import { users, organizations, payouts } from "../db/schema";
+import { clients, invoices } from "@/db/schema";
+import { users, organizations, payouts } from "@/db/schema";
 import { eq, and, sql } from "drizzle-orm";
-import { getSubscriptionAmount } from "../routes/v1/referral/service";
-import { type ENV } from "./types";
+// import { getSubscriptionAmount } from "../routes/v1/referral/service";
+import { getDB } from "./db/utils";
+import { ENV } from "./lib/types";
 
 const REWARD = 0.05;
 
-async function getDb(env: ENV): Promise<{ db: NodePgDatabase; client: Client }> {
-    const connectionString = env.DB.connectionString;
-    const client = new Client({ connectionString });
-    await client.connect();
-    const db = drizzle({ client });
-    return { db, client };
-}
-
 /* Handles overdue invoice notifications */
 export async function invoiceNotify(env: ENV): Promise<any> {
-    const { db, client } = await getDb(env);
+    const { db, client } = await getDB(env.DB.connectionString);
 
     try {
         const allUsers = await db.select().from(users).where(eq(users.deleted, false));
@@ -27,7 +18,7 @@ export async function invoiceNotify(env: ENV): Promise<any> {
             const organization = await db
                 .select()
                 .from(organizations)
-                .where(eq(organizations.id, user.currentOrgId));
+                .where(eq(organizations.id, user.currentOrgID));
 
             if (!organization) continue;
 
@@ -35,14 +26,14 @@ export async function invoiceNotify(env: ENV): Promise<any> {
                 .select()
                 .from(clients)
                 .where(
-                    and(eq(clients.deleted, false), eq(clients.organizationId, user.currentOrgId)),
+                    and(eq(clients.deleted, false), eq(clients.organizationID, user.currentOrgID)),
                 );
 
             for (const client of allClients) {
                 const allInvoices = await db
                     .select()
                     .from(invoices)
-                    .where(eq(invoices.clientId, client.id));
+                    .where(eq(invoices.clientID, client.id));
 
                 for (const invoice of allInvoices) {
                     if (invoice.notified) continue;
