@@ -1,13 +1,13 @@
-import { useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useMemo, useState } from "react";
+import { FlatList, Modal, Pressable, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { radii, useTheme } from '../constants/theme';
+import { radii, useTheme } from "../constants/theme";
 
-import { Icon } from './Icon';
-import { SheetHeader } from './SheetHeader';
-import { Text } from './Text';
-import { TextButton } from './TextButton';
+import { Icon } from "./Icon";
+import { SheetHeader } from "./SheetHeader";
+import { Text } from "./Text";
+import { TextButton } from "./TextButton";
 
 export type SelectOption<T extends string> = { value: T; label: string };
 
@@ -36,7 +36,7 @@ export function SelectSheet<T extends string>({
   searchable,
 }: Props<T>) {
   const { colors } = useTheme();
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -45,19 +45,19 @@ export function SelectSheet<T extends string>({
   }, [options, query]);
 
   const close = () => {
-    setQuery('');
+    setQuery("");
     onClose();
   };
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={close}>
-      <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: colors.groupedBackground }}>
+      <SafeAreaView edges={["bottom"]} style={{ flex: 1, backgroundColor: colors.groupedBackground }}>
         <SheetHeader title={title} left={<TextButton title="Cancel" onPress={close} />} />
         {searchable ? (
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
+              flexDirection: "row",
+              alignItems: "center",
               gap: 8,
               margin: 16,
               marginBottom: 8,
@@ -99,8 +99,8 @@ export function SelectSheet<T extends string>({
                   close();
                 }}
                 style={({ pressed }) => ({
-                  flexDirection: 'row',
-                  alignItems: 'center',
+                  flexDirection: "row",
+                  alignItems: "center",
                   marginHorizontal: 16,
                   paddingHorizontal: 16,
                   minHeight: 44,

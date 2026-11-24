@@ -8,7 +8,7 @@ import {
     timestamp,
     varchar,
 } from "drizzle-orm/pg-core";
-import type { InvoiceNumber, InvoiceItem, InvoiceClientInfo } from "@/lib/types/invoice-types";
+import type { InvoiceNumber, InvoiceItem, ClientInfo } from "@invoice/shared";
 
 const baseColumns = {
     deleted: boolean("deleted").notNull().default(false),
@@ -97,7 +97,7 @@ export const invoices = pgTable("invoices", {
         .references(() => clients.id)
         .notNull(),
     clientName: varchar("client_name").notNull(),
-    clientInfo: jsonb("client_info").$type<InvoiceClientInfo>().notNull(),
+    clientInfo: jsonb("client_info").$type<ClientInfo>().notNull(),
     issueDate: timestamp("issue_date", { withTimezone: true }).notNull(),
     dueDate: timestamp("due_date", { withTimezone: true }).notNull(),
     status: varchar("status").notNull(),
