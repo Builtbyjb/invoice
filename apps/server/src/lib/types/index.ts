@@ -37,19 +37,6 @@ export type ReturnId = {
     id: number | undefined;
 };
 
-export class ErrorResult extends Error {
-    public code: ContentfulStatusCode;
-
-    constructor(message: string, code: ContentfulStatusCode, options?: ErrorOptions) {
-        super(message, options);
-
-        this.code = code;
-        this.name = "ErrorResult";
-
-        Object.setPrototypeOf(this, ErrorResult.prototype);
-    }
-}
-
 export type MonthlyRevenue = {
     month: string;
     amount: number;
