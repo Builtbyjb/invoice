@@ -1,8 +1,7 @@
-import { ENV, TokenPayload } from "@/lib/types";
+import { ENV } from "@/lib/types";
 import { MiddlewareHandler } from "hono";
 import { AuthService } from "./service";
 import { getDB } from "@/db/utils";
-import { AuthRepository } from "./respository";
 import { UserRepository } from "../user/respository";
 
 export interface AuthContext {

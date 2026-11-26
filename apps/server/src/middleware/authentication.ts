@@ -2,12 +2,15 @@ import { MiddlewareHandler } from "hono";
 import type { TokenPayload, ENV } from "@/lib/types";
 import { verify } from "hono/jwt";
 import { AuthService } from "@/routes/v1/auth/service";
+import { createMiddleware } from "hono/factory";
 
-export default function authMiddleware(): MiddlewareHandler<{
+export interface AuthMiddlewareContext {
     Bindings: ENV;
-    Variables: { jwtPayload: TokenPayload };
-}> {
-    return async (c, next) => {
+    Variables: { jwt: TokenPayload };
+}
+
+export const authMiddleware = createMiddleware<AuthMiddlewareContext>(
+    async (c, next) => {
         const accessToken = AuthService.getTokenFromHeader(c);
         if (!accessToken) return c.json({ message: "Unauthorized: Access token not found" }, 401);
 
@@ -19,11 +22,12 @@ export default function authMiddleware(): MiddlewareHandler<{
 
         try {
             const payload = (await verify(accessToken, secret, "HS256")) as TokenPayload;
-            c.set("jwtPayload", payload);
+            c.set("jwt", payload);
             await next();
         } catch (error) {
             console.log(error);
             return c.json({ message: "Unauthorized: Invalid access token" }, 401);
         }
-    };
-}
+
+    }
+)

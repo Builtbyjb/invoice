@@ -33,10 +33,9 @@ export const FeedBackSchema = S.Struct({
 });
 
 /*---------- Client Schemas -------- */
-export const ClientQuerySchema = S.Struct({
-    name: S.NullOr(S.String),
-    page: S.NullOr(S.Finite).pipe(S.withConstructorDefault(Effect.succeed(1))),
-    size: S.NullOr(S.Finite).pipe(S.withConstructorDefault(Effect.succeed(10))),
+export const URLQuerySchema = S.Struct({
+    page: S.Finite.pipe(S.withConstructorDefault(Effect.succeed(1))),
+    size: S.Finite.pipe(S.withConstructorDefault(Effect.succeed(10))),
 });
 
 export const ClientRequestSchema = S.Struct({
@@ -61,6 +60,8 @@ export const ClientSchema = S.Struct({
     note: S.NullOr(S.String),
     createdAt: S.Date,
 });
+
+export const ClientListSchema = S.Array(ClientSchema)
 
 /*---------- Invoice Schemas -------*/
 export const InvoiceQuerySchema = S.Struct({

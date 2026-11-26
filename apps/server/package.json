@@ -10,6 +10,7 @@
     "lint": "lint"
   },
   "dependencies": {
+    "@hono/effect-validator": "^1.2.0",
     "@hono/zod-validator": "^0.4.3",
     "@invoice/shared": "workspace:*",
     "dotenv": "^17.4.2",

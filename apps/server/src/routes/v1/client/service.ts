@@ -1,187 +1,93 @@
-import { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { eq, and, ilike, desc } from "drizzle-orm";
-import { clients, invoices } from "@/db/schema";
-// import { members } from "@/db/schema";
-import { ClientListSchema, ClientSchema } from "@/lib/zod-schema/client-zod-schema";
-import type { ClientDTO, FetchedClients } from "@/lib/types/client-types";
-import { MAX_PAGE_SIZE } from "@/lib/constants";
-import type { FetchedInvoices } from "@/lib/types/invoice-types";
-import { InvoiceListSchema } from "@/lib/zod-schema/invoice-zod-schema";
+import {
+    ClientListSchema,
+    ClientSchema,
+    MAX_PAGE_SIZE,
+    Client,
+    QueryResult,
+    Invoice,
+    URLQuery,
+    InvoiceListSchema,
+    ClientRequest
+} from "@invoice/shared";
+import { ClientRepository } from "./repository";
+import { Schema } from "effect";
+import { HTTPException } from "hono/http-exception";
+import { InvoiceRepository } from "../invoice/repository";
 
-export async function fetchClientsPage(
-    db: NodePgDatabase,
-    orgID: number,
-    page: number,
-    size: number,
-): Promise<FetchedClients> {
-    const baseWhere = and(eq(clients.organizationID, orgID), eq(clients.deleted, false));
-    const limit = Math.min(size, MAX_PAGE_SIZE);
-    const offset = (page - 1) * limit;
+export class ClientService {
+    private readonly clientRepo: ClientRepository
+    private readonly invoiceRepo: InvoiceRepository
 
-    const [totalCount, result] = await Promise.all([
-        db.$count(clients, baseWhere),
-        db
-            .select()
-            .from(clients)
-            .where(baseWhere)
-            .orderBy(desc(clients.createdAt))
-            .limit(limit)
-            .offset(offset),
-    ]);
+    constructor(clientRepository: ClientRepository, invoiceRepository: InvoiceRepository) {
+        this.clientRepo = clientRepository
+        this.invoiceRepo = invoiceRepository
+    }
 
-    return {
-        data: ClientListSchema.parse(result),
-        meta: {
-            totalCount: totalCount,
-            totalPages: Math.ceil(totalCount / limit),
-            currentPage: page,
-            perPage: limit,
-        },
-    };
-}
+    public async getClients(orgID: number, page: number, size: number): Promise<
+        QueryResult<readonly Client[]>
+    > {
+        const limit = Math.min(size, MAX_PAGE_SIZE);
+        const offset = (page - 1) * limit;
 
-export async function findClientsByName(
-    db: NodePgDatabase,
-    orgID: number,
-    name: string,
-    page: number,
-    size: number,
-): Promise<FetchedClients> {
-    const limit = Math.min(size, MAX_PAGE_SIZE);
-    const offset = (page - 1) * limit;
+        const { result, totalCount } = await this.clientRepo
+            .findClientsByOrgID(orgID, limit, offset)
 
-    const baseWhere = and(
-        eq(clients.organizationID, orgID),
-        eq(clients.deleted, false),
-        ilike(clients.name, `%${name}%`),
-    );
+        return {
+            data: Schema.decodeUnknownSync(ClientListSchema)(result),
+            meta: {
+                totalCount: totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+                currentPage: page,
+                perPage: limit,
+            },
+        };
+    }
 
-    const [totalCount, result] = await Promise.all([
-        db.$count(clients, baseWhere),
-        db
-            .select()
-            .from(clients)
-            .where(baseWhere)
-            .orderBy(desc(clients.createdAt))
-            .limit(limit)
-            .offset(offset),
-    ]);
+    public async getClient(clientID: string): Promise<Client> {
+        const result = this.clientRepo.findClientByID(clientID)
+        if (!result) throw new HTTPException(404, { message: "Client not found" })
 
-    return {
-        data: ClientListSchema.parse(result),
-        meta: {
-            totalCount: totalCount,
-            totalPages: Math.ceil(totalCount / limit),
-            currentPage: page,
-            perPage: limit,
-        },
-    };
-}
+        return Schema.decodeUnknownSync(ClientSchema)(result)
+    }
 
-export async function getClientById(db: NodePgDatabase, id: string): Promise<ClientDTO | null> {
-    const result = await db
-        .select()
-        .from(clients)
-        .where(and(eq(clients.id, id), eq(clients.deleted, false)));
+    public async getClientInvoices(clientID: string, query: URLQuery): Promise<
+        QueryResult<readonly Invoice[]>
+    > {
 
-    if (result.length === 0) return null;
+        const limit = Math.min(query.size, MAX_PAGE_SIZE);
+        const offset = (query.page - 1) * limit;
 
-    return ClientSchema.parse(result[0]);
-}
+        const { result, totalCount } = await this.invoiceRepo
+            .findInvoicesByClientID(clientID, limit, offset)
 
-export async function fetchClientInvoicesPage(
-    db: NodePgDatabase,
-    clientID: string,
-    page: number,
-    size: number,
-): Promise<FetchedInvoices> {
-    const baseWhere = and(eq(invoices.clientID, clientID), eq(invoices.deleted, false));
-    const limit = Math.min(size, MAX_PAGE_SIZE);
-    const offset = (page - 1) * limit;
+        return {
+            data: Schema.decodeUnknownSync(InvoiceListSchema)(result),
+            meta: {
+                totalCount: totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+                currentPage: query.page,
+                perPage: limit
+            }
+        }
+    }
 
-    const [totalCount, result] = await Promise.all([
-        db.$count(invoices, baseWhere),
-        db
-            .select()
-            .from(invoices)
-            .where(baseWhere)
-            .orderBy(desc(invoices.createdAt))
-            .limit(size)
-            .offset(offset),
-    ]);
+    public async createClient(orgID: number, request: ClientRequest): Promise<Client> {
+        const result = await this.clientRepo.createClientByOrgID(orgID, request)
 
-    return {
-        data: InvoiceListSchema.parse(result),
-        meta: {
-            totalCount,
-            totalPages: Math.ceil(totalCount / limit),
-            currentPage: page,
-            perPage: limit,
-        },
-    };
-}
+        if (!result) throw new HTTPException(500, { message: "Error creating client" })
 
-export async function createClientRecord(
-    db: NodePgDatabase,
-    data: {
-        name: string;
-        email?: string;
-        phone?: string;
-        address?: string;
-        city?: string;
-        country?: string;
-    },
-    orgID: number,
-) {
-    const result = await db
-        .insert(clients)
-        .values({
-            id: crypto.randomUUID(),
-            organizationID: orgID,
-            name: data.name,
-            email: data.email,
-            phone: data.phone,
-            address: data.address,
-            city: data.city,
-            country: data.country,
-        })
-        .returning();
+        return Schema.decodeUnknownSync(ClientSchema)(result)
+    }
 
-    if (result.length === 0) return null;
+    public async updateClient(clientID: string, request: ClientRequest): Promise<Client> {
+        const result = await this.clientRepo.updateClientByID(clientID, request)
 
-    return ClientSchema.parse(result[0]);
-}
+        if (!result) throw new HTTPException(500, { message: "Error updating client" })
 
-export async function softDeleteClient(db: NodePgDatabase, id: string) {
-    await db.update(clients).set({ deleted: true }).where(eq(clients.id, id));
-}
+        return Schema.decodeUnknownSync(ClientSchema)(result)
+    }
 
-export async function updateClientRecord(
-    db: NodePgDatabase,
-    id: string,
-    data: {
-        name: string;
-        email?: string;
-        phone?: string;
-        address?: string;
-        city?: string;
-        country?: string;
-    },
-) {
-    const result = await db
-        .update(clients)
-        .set({
-            name: data.name,
-            email: data.email,
-            phone: data.phone,
-            address: data.address,
-            city: data.city,
-            country: data.country,
-        })
-        .where(eq(clients.id, id))
-        .returning();
-
-    if (result.length === 0) return null;
-
-    return ClientSchema.parse(result[0]);
+    public async deleteClient(clientID: string) {
+        await this.clientRepo.deleteClientByID(clientID)
+    }
 }
